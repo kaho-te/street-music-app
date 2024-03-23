@@ -10,6 +10,7 @@ import StopIcon from "@mui/icons-material/Stop";
 import IconButton from "@mui/material/IconButton";
 import { useState } from "react";
 import {
+    Box,
     Button,
     FormControlLabel,
     Modal,
@@ -47,16 +48,14 @@ const PlayMusic = (props) => {
     const [fileUrl, setFileUrl] = useState();
     const [open, setOpen] = useState(false);
     const { data, setData, post } = useForm({
-        // id: "",
-        // name: "",
-        // icon: "",
         text: "",
         music: "",
-        post_id: "",
-        user_id: "",
+        post_id: props.post.id,
+        user_id: props.auth.user.id,
     });
 
     console.log(props);
+    const comments = props.post.comments;
 
     const audioRef = useRef(null);
 
@@ -75,7 +74,6 @@ const PlayMusic = (props) => {
 
         setFileUrl(url);
         setData("music", newfile);
-        console.log("setFile");
     };
 
     // 録音
@@ -112,7 +110,6 @@ const PlayMusic = (props) => {
             handlePlay();
             setRecorder(newRecorder);
             setIsRecording(true);
-
         } catch (err) {
             if (err instanceof Error) {
                 setError("録音の開始に失敗しました: " + err.message);
@@ -155,14 +152,14 @@ const PlayMusic = (props) => {
         }
     };
     const handleLike = (e) => {
-      if(props.isLike){
-        console.log('いいね削除');
-        post(route("like.destroy",props.post), {preserveScroll: true});
-      } else {
-        console.log('いいね');
-        post(route("like.store", props.post))
-      }
-  };
+        if (props.isLike) {
+            console.log("いいね削除");
+            post(route("like.destroy", props.post), { preserveScroll: true });
+        } else {
+            console.log("いいね");
+            post(route("like.store", props.post));
+        }
+    };
 
     const handleRadioChange = (e) => {
         setRadio(e.target.value);
@@ -179,10 +176,20 @@ const PlayMusic = (props) => {
         audioRef.current.currentTime = 0;
     };
 
+    const handleSubmit = (e) => {
+        console.log("コメント投稿");
+        e.preventDefault();
+        setFile();
+        setFileUrl();
+        setOpen(false);
+
+        post(route("comment.store"));
+    };
+
     return (
         <div>
             <ModalHeader header="再生" />
-            <div className="mx-3 border-dotted border-b-2 border-gray-400">
+            <div className="mx-3 pt-12 border-dotted border-b-2 border-gray-400">
                 <div>{postData.user.name}</div>
                 <div>{postData.created_at}</div>
                 <div>{postData.address}</div>
@@ -193,138 +200,160 @@ const PlayMusic = (props) => {
                     src={storagePath + postData.user_id + "/" + postData.music}
                 ></audio>
                 <div className="flex justify-around my-3 mx-3">
-                    <IconButton onClick={handleLike}>
+                    <IconButton type="button" onClick={handleLike}>
                         {props.isLike ? (
                             <FavoriteIcon style={{ color: "#eb3495" }} />
                         ) : (
-                            <FavoriteBorderIcon/>
+                            <FavoriteBorderIcon />
                         )}
                     </IconButton>
-                    <IconButton onClick={handleModalOpen}>
-                        <LyricsRoundedIcon  />
+                    <IconButton type="button" onClick={handleModalOpen}>
+                        <LyricsRoundedIcon />
                     </IconButton>
                 </div>
             </div>
+            {comments.map((comment, index) => (
+            <div key={index} className="mx-3 py-3 border-dotted border-b-2 border-gray-400">
+              <div>{comment.user.name}</div>
+                <div>{comment.created_at}</div>
+                <div>{comment.text}</div>
+                <audio
+                    ref={audioRef}
+                    controls
+                    src={storagePath + comment.user_id + "/" + comment.music}
+                ></audio>
+            </div>
+            ))}
             <div>
                 <Modal className="" open={open} onClose={handleModalClose}>
                     <div className="bg-white absolute bottom-0 w-full h-2/3 px-3 overflow-y-scroll">
-                        <div className="py-3 w-full flex items-center justify-center">
-                            <div className="">コメントを書く</div>
-                            <div className="mr-3 absolute right-0">
-                                <Button
-                                    type={"submit"}
-                                    variant="outlined"
-                                    color="inherit"
-                                >
-                                    投稿
-                                </Button>
+                        <Box
+                            component="form"
+                            onSubmit={handleSubmit}
+                            encType="multipart/form-data"
+                            className="px-3"
+                        >
+                            <div className="py-3 w-full flex items-center justify-center">
+                                <div className="">コメントを書く</div>
+                                <div className="mr-3 absolute right-0">
+                                    <Button
+                                        variant="outlined"
+                                        color="inherit"
+                                        type="submit"
+                                    >
+                                        投稿
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
 
-                        <Typography
-                            variant="body1"
-                            component="h6"
-                            mt={3}
-                            gutterBottom
-                        >
-                            コメント
-                        </Typography>
-                        <TextField
-                            variant="standard"
-                            multiline
-                            className="text w-full"
-                            onChange={(e) => setData("text", e.target.value)}
-                        />
-                        <Typography
-                            variant="body1"
-                            component="h6"
-                            mt={5}
-                            gutterBottom
-                        >
-                            投稿方法
-                        </Typography>
-                        <RadioGroup
-                            defaultValue="record"
-                            row
-                            onChange={handleRadioChange}
-                        >
-                            <FormControlLabel
-                                value="record"
-                                control={<Radio />}
-                                label="録音"
+                            <Typography
+                                variant="body1"
+                                component="h6"
+                                mt={3}
+                                gutterBottom
+                            >
+                                コメント
+                            </Typography>
+                            <TextField
+                                variant="standard"
+                                multiline
+                                className="text w-full"
+                                onChange={(e) =>
+                                    setData("text", e.target.value)
+                                }
                             />
-                            <FormControlLabel
-                                value="file"
-                                control={<Radio />}
-                                label="ファイルアップロード"
-                            />
-                        </RadioGroup>
-                        {radio === "record" && (
-                            <>
-                                <div className="mt-3">
-                                    <audio
-                                        controls={true}
-                                        src={fileUrl}
-                                    ></audio>
-                                    {/* <button onClick={handlePlay}>Play Sound</button> */}
-                                </div>
-                                {/* 録音コンポーネント */}
-                                <div className="flex flex-col justify-center items-center z-50 py-8">
-                                    <RecButton
-                                        isRecording={isRecording}
-                                        stopCallback={stopRecording}
-                                        startCallback={startRecording}
-                                    />
-                                </div>
-                            </>
-                        )}
-                        {radio === "file" && (
-                            <>
-                                <Typography
-                                    variant="body1"
-                                    component="h6"
-                                    mt={3}
-                                    gutterBottom
-                                >
-                                    ファイル選択
-                                </Typography>
-                                <MuiFileInput
-                                    value={file}
-                                    onChange={handleChangeFile}
-                                    variant="standard"
+                            <Typography
+                                variant="body1"
+                                component="h6"
+                                mt={5}
+                                gutterBottom
+                            >
+                                投稿方法
+                            </Typography>
+                            <RadioGroup
+                                defaultValue="record"
+                                row
+                                onChange={handleRadioChange}
+                            >
+                                <FormControlLabel
+                                    value="record"
+                                    control={<Radio />}
+                                    label="録音"
                                 />
-                                <br />
-                                <Typography
-                                    variant="caption"
-                                    component="div"
-                                    gutterBottom
-                                >
-                                    MP3/WAV ファイルのみ。
-                                </Typography>
-                                {file &&
-                                    !(
-                                        file.type === "audio/mpeg" ||
-                                        file.type === "audio/wav" ||
-                                        file.type === "audio/webm"
-                                    ) && (
-                                        <Typography
-                                            variant="caption"
-                                            component="div"
-                                            color="error.main"
-                                            gutterBottom
-                                        >
-                                            このファイルタイプはサポートしていません。
-                                        </Typography>
-                                    )}
-                                <div className="mt-3">
-                                    <audio
-                                        controls={true}
-                                        src={fileUrl}
-                                    ></audio>
-                                    {/* <button onClick={handlePlay}>Play Sound</button> */}
-                                </div>
-                            </>
-                        )}
+                                <FormControlLabel
+                                    value="file"
+                                    control={<Radio />}
+                                    label="ファイルアップロード"
+                                />
+                            </RadioGroup>
+                            {radio === "record" && (
+                                <>
+                                    <div className="mt-3">
+                                        <audio
+                                            controls={true}
+                                            src={fileUrl}
+                                        ></audio>
+                                        {/* <button onClick={handlePlay}>Play Sound</button> */}
+                                    </div>
+                                    {/* 録音コンポーネント */}
+                                    <div className="flex flex-col justify-center items-center z-50 py-8">
+                                        <RecButton
+                                            type="button"
+                                            isRecording={isRecording}
+                                            stopCallback={stopRecording}
+                                            startCallback={startRecording}
+                                        />
+                                    </div>
+                                </>
+                            )}
+                            {radio === "file" && (
+                                <>
+                                    <Typography
+                                        variant="body1"
+                                        component="h6"
+                                        mt={3}
+                                        gutterBottom
+                                    >
+                                        ファイル選択
+                                    </Typography>
+                                    <MuiFileInput
+                                        value={file}
+                                        onChange={handleChangeFile}
+                                        variant="standard"
+                                    />
+                                    <br />
+                                    <Typography
+                                        variant="caption"
+                                        component="div"
+                                        gutterBottom
+                                    >
+                                        MP3/WAV ファイルのみ。
+                                    </Typography>
+                                    {file &&
+                                        !(
+                                            file.type === "audio/mpeg" ||
+                                            file.type === "audio/wav" ||
+                                            file.type === "audio/webm"
+                                        ) && (
+                                            <Typography
+                                                variant="caption"
+                                                component="div"
+                                                color="error.main"
+                                                gutterBottom
+                                            >
+                                                このファイルタイプはサポートしていません。
+                                            </Typography>
+                                        )}
+                                    <div className="mt-3">
+                                        <audio
+                                            controls={true}
+                                            src={fileUrl}
+                                        ></audio>
+                                        {/* <button onClick={handlePlay}>Play Sound</button> */}
+                                    </div>
+                                </>
+                            )}
+                        </Box>
                     </div>
                 </Modal>
             </div>

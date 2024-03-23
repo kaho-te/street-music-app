@@ -14,7 +14,7 @@ import { useEffect } from "react";
 import RecordRTC, { StereoAudioRecorder } from "recordrtc";
 import MicIcon from "@mui/icons-material/Mic";
 import StopIcon from "@mui/icons-material/Stop";
-import { Link, useForm } from "@inertiajs/react";
+import { Link, useForm, usePage } from "@inertiajs/react";
 import ModalHeader from "@/Components/ModalHeader";
 
 const getCurrentDate = (props) => {
@@ -187,7 +187,12 @@ const AddMusic = (props) => {
                     </Button>
                 </div>
             </div>
-            <Box component="form" onSubmit={handleSubmit}>
+            <Box
+                component="form"
+                encType="multipart/form-data"
+                onSubmit={handleSubmit}
+                className="px-3"
+            >
                 <Typography variant="body1" component="h6" mt={5} gutterBottom>
                     設置場所
                 </Typography>

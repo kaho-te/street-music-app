@@ -38,7 +38,13 @@ class PostLikeController extends Controller
      */
     public function show()
     {
-        return Inertia::render('PlayList');
+        $favorite = Post::with('liked')->whereHas('liked', function($query){
+            $query->where('user_id', auth()->id());
+        })->with('user')->get();
+
+        return Inertia::render('PlayList', [
+            'favorite' => $favorite
+        ]);
     }
 
     /**

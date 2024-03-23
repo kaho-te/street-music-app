@@ -62,7 +62,7 @@ class PostController extends Controller
      */
     public function show(string $id)
     {
-        $post = Post::where('id', $id)->with('user')->with('comments')->first();
+        $post = Post::where('id', $id)->with('user')->with('comments.user')->first();
         $isLike = Post::find($id)->liked()->pluck('users.id')->contains(auth()->id());
 
         return Inertia::render('PlayMusic', [

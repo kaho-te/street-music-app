@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class CommentController extends Controller
 {
@@ -28,7 +30,23 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $userId = auth()->id();
+        if ($request->hasFile('music')) {
+            $audio = $request->file('music');
+            $file = Storage::putFile('public/audio/'.$userId, $audio);
+            $filename = basename($file);
+        } else {
+            return Inertia::render('PlayMusic');
+        }
+        $user = $request->user();
+
+        $post = $user->comments()->create([
+            'text' => $request->text,
+            'music' => $filename,
+            'post_id' => $request->post_id
+        ]);
+
+        return to_route('post.show', $request->post_id);
     }
 
     /**
