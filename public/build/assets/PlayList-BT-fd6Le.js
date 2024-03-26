@@ -1,1 +1,0 @@
-import{j as t}from"./app-BKVF0Qni.js";import{H as r,S as s}from"./Header-goDl7jex.js";import"./ButtonBase-9Lj1nNSh.js";const i=()=>t.jsxs("div",{children:[t.jsx(r,{header:"お気に入り"}),t.jsx(s,{})]});export{i as default};
