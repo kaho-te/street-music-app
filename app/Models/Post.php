@@ -10,7 +10,7 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title','story','music','latitude','longitude'];
+    protected $fillable = ['title','story','music','address','latitude','longitude'];
 
     public function liked()
     {

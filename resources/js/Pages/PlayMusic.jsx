@@ -22,6 +22,7 @@ import {
 import { useForm } from "@inertiajs/react";
 import { MuiFileInput } from "mui-file-input";
 import { useRef } from "react";
+import { useEffect } from "react";
 
 const getCurrentDate = () => {
     const now = new Date();
@@ -43,6 +44,7 @@ const PlayMusic = (props) => {
     const [recordings, setRecordings] = useState([]);
     const [radio, setRadio] = useState("record");
     const [address, setAddress] = useState();
+    const [comments, setComments] = useState([]);
 
     const [file, setFile] = useState();
     const [fileUrl, setFileUrl] = useState();
@@ -54,10 +56,13 @@ const PlayMusic = (props) => {
         user_id: props.auth.user.id,
     });
 
-    console.log(props);
-    const comments = props.post.comments;
+    useEffect(() => {
+        setComments(props.post.comments);
+    }, [comments]);
 
-    const audioRef = useRef(null);
+
+    const mainAudioRef = useRef(null);
+    const subAudioRef = useRef(null);
 
     function handleModalOpen() {
         setOpen(true);
@@ -107,7 +112,7 @@ const PlayMusic = (props) => {
                 mimeType: "audio/wav",
             });
             newRecorder.startRecording();
-            handlePlay();
+            handleMainPlay();
             setRecorder(newRecorder);
             setIsRecording(true);
         } catch (err) {
@@ -119,10 +124,10 @@ const PlayMusic = (props) => {
 
     // 録音の停止
     const stopRecording = () => {
-        handlePause();
+        handleMainPause();
         if (recorder) {
             recorder.stopRecording(() => {
-                console.log(recorder);
+                // console.log(recorder);
                 const currentDate = getCurrentDate();
                 const blob = recorder.getBlob();
                 const recordFile = new File(
@@ -153,10 +158,8 @@ const PlayMusic = (props) => {
     };
     const handleLike = (e) => {
         if (props.isLike) {
-            console.log("いいね削除");
             post(route("like.destroy", props.post), { preserveScroll: true });
         } else {
-            console.log("いいね");
             post(route("like.store", props.post));
         }
     };
@@ -165,16 +168,38 @@ const PlayMusic = (props) => {
         setRadio(e.target.value);
     };
 
-    const handlePlay = () => {
-        audioRef.current.volume = 0.3;
-        audioRef.current.play();
-        console.log(audioRef);
+    const handleMainPlay = () => {
+        mainAudioRef.current.volume = 0.3;
+        mainAudioRef.current.play();
     };
 
-    const handlePause = () => {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
+    const handleMainPause = () => {
+        mainAudioRef.current.pause();
+        mainAudioRef.current.currentTime = 0;
     };
+
+    const handleSubPlay = () => {
+        subAudioRef.current.volume = 0.3;
+        subAudioRef.current.play();
+    };
+
+    const handleSubPause = () => {
+        subAudioRef.current.pause();
+        subAudioRef.current.currentTime = 0;
+    };
+
+    const handleSession = () => {
+        // console.log("再生");
+        handleSubPlay();
+        setTimeout(() => {
+            handleMainPlay();
+        }, 100); 
+        
+        // document.querySelectorAll('audio').forEach(audio => {
+        //     audio.play();
+        // });
+
+    }
 
     const handleSubmit = (e) => {
         console.log("コメント投稿");
@@ -190,14 +215,27 @@ const PlayMusic = (props) => {
         <div>
             <ModalHeader header="再生" />
             <div className="mx-3 pt-12 border-dotted border-b-2 border-gray-400">
-                <div>{postData.user.name}</div>
-                <div>{postData.created_at}</div>
-                <div>{postData.address}</div>
-                <div>{postData.story}</div>
+                <div className="flex items-center mt-2">
+                <img
+                    className="mr-2 w-12 h-12"
+                    style={{ borderRadius: '50%' }}
+                    src={`../storage/image/${props.post.user.account.icon}`}
+                    alt="アイコン"
+                />
+                    <div>
+                        <div>{postData.user.name}</div>
+                        <div>{postData.created_at}</div>
+                    </div>
+                </div>
+
+                <div className="mt-2">{postData.address}</div>
+                <div className="mt-2">{postData.story}</div>
                 <audio
-                    ref={audioRef}
+                    id="main"
+                    ref={mainAudioRef}
                     controls
                     src={storagePath + postData.user_id + "/" + postData.music}
+                    className="mt-2"
                 ></audio>
                 <div className="flex justify-around my-3 mx-3">
                     <IconButton type="button" onClick={handleLike}>
@@ -214,14 +252,26 @@ const PlayMusic = (props) => {
             </div>
             {comments.map((comment, index) => (
             <div key={index} className="mx-3 py-3 border-dotted border-b-2 border-gray-400">
-              <div>{comment.user.name}</div>
-                <div>{comment.created_at}</div>
-                <div>{comment.text}</div>
+                <div className="mt-2 flex items-center">
+                    <img
+                        className="mr-2 w-12 h-12"
+                        style={{ borderRadius: '50%' }}
+                        src={`../storage/image/${comment.user.account.icon}`}
+                        alt="アイコン"
+                    />
+                    <div>
+                        <div>{comment.user.name}</div>
+                        <div>{comment.created_at}</div>
+                    </div>
+                </div>
+                <div className="mt-2">{comment.text}</div>
                 <audio
-                    ref={audioRef}
+                    className="my-2"
+                    ref={subAudioRef}
                     controls
                     src={storagePath + comment.user_id + "/" + comment.music}
                 ></audio>
+                <Button variant="outlined" onClick={handleSession} style={{ color: "#eb3495", borderColor: "#eb3495" }} >Session</Button>
             </div>
             ))}
             <div>
@@ -293,7 +343,6 @@ const PlayMusic = (props) => {
                                             controls={true}
                                             src={fileUrl}
                                         ></audio>
-                                        {/* <button onClick={handlePlay}>Play Sound</button> */}
                                     </div>
                                     {/* 録音コンポーネント */}
                                     <div className="flex flex-col justify-center items-center z-50 py-8">
@@ -349,7 +398,6 @@ const PlayMusic = (props) => {
                                             controls={true}
                                             src={fileUrl}
                                         ></audio>
-                                        {/* <button onClick={handlePlay}>Play Sound</button> */}
                                     </div>
                                 </>
                             )}

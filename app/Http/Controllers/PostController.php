@@ -38,23 +38,23 @@ class PostController extends Controller
         $userId = auth()->id();
         if ($request->hasFile('music')) {
             $audio = $request->file('music');
-            $file = Storage::putFile('audio/'.$userId, $audio);
+            $file = Storage::putFile('public/audio/'.$userId, $audio);
             $filename = basename($file);
             // $audio->store('public/audio'.$userId);
         } else {
-            return Inertia::render('Home');
+            return to_route('posts.index');
         }
         $user = $request->user();
 
         $post = $user->posts()->create([
             'story' => $request->story,
             'music' => $filename,
+            'address' => $request->address,
             'latitude' => $request->latitude,
-            'longitude' => $request->longitude
+            'longitude' => $request->longitude,
         ]);
         // return response()->json(['success' => false], 400);
-        // return to_route('posts.index');
-        return Inertia::render('Home');
+        return to_route('posts.index');
     }
 
     /**
@@ -62,7 +62,7 @@ class PostController extends Controller
      */
     public function show(string $id)
     {
-        $post = Post::where('id', $id)->with('user')->with('comments.user')->first();
+        $post = Post::where('id', $id)->with('user.account')->with('comments.user.account')->first();
         $isLike = Post::find($id)->liked()->pluck('users.id')->contains(auth()->id());
 
         return Inertia::render('PlayMusic', [

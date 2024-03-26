@@ -40,7 +40,7 @@ class PostLikeController extends Controller
     {
         $favorite = Post::with('liked')->whereHas('liked', function($query){
             $query->where('user_id', auth()->id());
-        })->with('user')->get();
+        })->with('user.account')->get();
 
         return Inertia::render('PlayList', [
             'favorite' => $favorite
