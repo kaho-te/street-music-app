@@ -3,7 +3,7 @@ import React from 'react'
 
 const Header = (props) => {
   return (
-    <div className="py-3 w-full flex items-center justify-center bg-pink-200">
+    <div className="fixed py-3 w-full flex items-center justify-center bg-pink-200 z-10">
       <Link className="px-6 absolute left-0" href="/posts">
         戻る
       </Link>

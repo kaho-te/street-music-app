@@ -49,12 +49,9 @@ const Home = (props) => {
         navigator.geolocation.getCurrentPosition((position) => {
             const { latitude, longitude } = position.coords;
             setPosition({ lat: latitude, lng: longitude });
-            console.log(latitude);
-            //
         });
     }, [isFirstRef]);
 
-    console.log(position);
 
     function handleMapClick(event) {
         setMarker({
@@ -64,7 +61,6 @@ const Home = (props) => {
     }
 
     function handleAddMusic(event) {
-        console.log(position);
         router.get(route("posts.create", position));
     }
 
@@ -84,10 +80,10 @@ const Home = (props) => {
                     mapContainerStyle={containerStyle}
                     // onClick={handleMapClick}
                 >
-                    <Marker
+                    {/* <Marker
                         icon={icon}
                         position={position}
-                    />
+                    /> */}
 
                     {props.posts.map((post, index) => (
                         <Marker

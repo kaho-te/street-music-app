@@ -14,7 +14,7 @@ import { useEffect } from "react";
 import RecordRTC, { StereoAudioRecorder } from "recordrtc";
 import MicIcon from "@mui/icons-material/Mic";
 import StopIcon from "@mui/icons-material/Stop";
-import { Link, useForm } from "@inertiajs/react";
+import { Link, useForm, usePage } from "@inertiajs/react";
 import ModalHeader from "@/Components/ModalHeader";
 
 const getCurrentDate = (props) => {
@@ -60,7 +60,7 @@ const AddMusic = (props) => {
 
         setFileUrl(url);
         setData("music", newfile);
-        console.log("setFile");
+        // console.log("setFile");
     };
 
     // 録音
@@ -109,7 +109,7 @@ const AddMusic = (props) => {
     const stopRecording = () => {
         if (recorder) {
             recorder.stopRecording(() => {
-                console.log(recorder);
+                // console.log(recorder);
                 const currentDate = getCurrentDate();
                 const blob = recorder.getBlob();
                 const recordFile = new File(
@@ -148,7 +148,7 @@ const AddMusic = (props) => {
                 if (data.results.length > 0) {
                     const address = data.results[0].formatted_address;
                     setData("address", address);
-                    console.log(address); // 逆ジオコーディングの結果として取得した住所
+                    // console.log(address); // 逆ジオコーディングの結果として取得した住所
                 } else {
                     console.log("No results found");
                 }
@@ -176,6 +176,11 @@ const AddMusic = (props) => {
 
     return (
         <>
+                    <Box
+                component="form"
+                encType="multipart/form-data"
+                onSubmit={handleSubmit}
+            >
             <div className="py-3 w-full flex items-center justify-center bg-pink-200">
                 <Link className="px-6 absolute left-0" href="/posts">
                     戻る
@@ -187,7 +192,7 @@ const AddMusic = (props) => {
                     </Button>
                 </div>
             </div>
-            <Box component="form" onSubmit={handleSubmit}>
+<div className="px-3">
                 <Typography variant="body1" component="h6" mt={5} gutterBottom>
                     設置場所
                 </Typography>
@@ -281,6 +286,7 @@ const AddMusic = (props) => {
 
                 <div className="mt-3">
                     <audio controls={true} src={fileUrl}></audio>
+                </div>
                 </div>
             </Box>
         </>

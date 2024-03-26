@@ -15,7 +15,7 @@ export default function SimpleBottomNavigation(props) {
     // アクセス時のURLを解析して、適切なナビゲーションボタンをアクティブにする。
     const [value, setValue] = useState(window.location.pathname.slice(1));
 
-    console.log(value);
+    // console.log(value);
 
     return (
         <>
