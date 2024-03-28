@@ -27,8 +27,15 @@ class Post extends Model
         return $this->hasMany(Comment::class);
     }
 
-    public function getCreatedAtAttribute($value)
-{
-    return Carbon::parse($value)->format('Y/m/d H:i:s');
-}
+    /**
+    * 配列/JSONシリアル化の日付を準備
+    *
+    * @param  \DateTimeInterface  $date
+    * @return string
+    */
+    protected function serializeDate(\DateTimeInterface $date)
+    {
+    return $date->format('Y/m/d H:i:s');
+    }
+
 }

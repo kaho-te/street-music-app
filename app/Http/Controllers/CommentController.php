@@ -76,8 +76,13 @@ class CommentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Comment $comment)
+    public function destroy($id)
     {
-        //
+        $comment = Comment::find($id);
+        $post_id = $comment->post_id;
+        $music = $comment->music; 
+        Storage::disk('public')->delete('audio/'.auth()->id().'/'.$music);
+        $comment->delete();
+        return to_route('post.show', $post_id);
     }
 }

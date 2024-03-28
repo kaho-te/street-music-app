@@ -40,8 +40,9 @@ Route::middleware('auth')->group(function () {
     
     Route::resource('/posts', PostController::class);
     Route::get('/post/{id}', [PostController::class, 'show'])->name('post.show');
-    Route::post('/comments', [CommentController::class, 'store'])->name('comment.store');
-    Route::delete('/comments', [CommentController::class, 'destroy'])->name('comment.destroy');
+    Route::post('/post/{id}', [PostController::class, 'destroy'])->name('post.destroy');
+    Route::post('/comment', [CommentController::class, 'store'])->name('comment.store');
+    Route::post('/comment/{id}', [CommentController::class, 'destroy'])->name('comment.destroy');
     Route::get('/account', [AccountController::class, 'show'])->name('account.show');
     Route::get('/favoritelist', [PostLikeController::class, 'show'])->name('like.show');
     Route::post('/posts/{post}/like', [PostLikeController::class, 'store'])->name('like.store');

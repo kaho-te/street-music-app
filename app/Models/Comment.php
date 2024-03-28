@@ -22,8 +22,15 @@ class Comment extends Model
         return $this->belongsTo(Post::class);
     }
 
-    public function getCreatedAtAttribute($value)
+    /**
+    * 配列/JSONシリアル化の日付を準備
+    *
+    * @param  \DateTimeInterface  $date
+    * @return string
+    */
+    protected function serializeDate(\DateTimeInterface $date)
     {
-        return Carbon::parse($value)->format('Y/m/d H:i:s');
+    return $date->format('Y/m/d H:i:s');
     }
+
 }

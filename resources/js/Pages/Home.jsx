@@ -60,7 +60,7 @@ const Home = (props) => {
         });
     }
 
-    function handleAddMusic(event) {
+    function handleAddMusic() {
         router.get(route("posts.create", position));
     }
 
@@ -75,7 +75,7 @@ const Home = (props) => {
             <LoadScript googleMapsApiKey={apiKey}>
                 <GoogleMap
                     center={position}
-                    zoom={15}
+                    zoom={17}
                     options={options}
                     mapContainerStyle={containerStyle}
                     // onClick={handleMapClick}

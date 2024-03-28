@@ -1,6 +1,7 @@
 import SimpleBottomNavigation from "@/Components/BottomNavigation";
 import React from "react";
 import Header from "@/Components/Header";
+import { Link } from "@inertiajs/react";
 
 const PlayList = (props) => {
     const storagePath = "../storage/audio/";
@@ -10,7 +11,9 @@ const PlayList = (props) => {
             <Header header="お気に入り" />
             <div className="pt-12">
                 {favoriteLists.map((favorite, index) => (
-                    <div className="mx-3 border-dotted border-b-2 border-gray-400">
+                
+                    <div className="mx-3 border-dotted border-b-2 border-gray-400" key={favorite.id}>
+                   <Link href={route('post.show', favorite.id)} underline="none">
                     <div className="my-2 flex items-center">
                         <img
                             className="mr-2 w-12 h-12"
@@ -48,11 +51,14 @@ const PlayList = (props) => {
                         <LyricsRoundedIcon  />
                     </IconButton>
                 </div> */}
+                </Link>
                     </div>
+                    
                 ))}
             </div>
             <SimpleBottomNavigation />
         </div>
+        
     );
 };
 
