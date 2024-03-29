@@ -160,9 +160,18 @@ const PlayMusic = (props) => {
     };
     const handleLike = (e) => {
         if (props.isLike) {
-            post(route("like.destroy", postData), { preserveScroll: true });
+            post(route("like.destroy", postData), { 
+                preserveScroll: true,
+                onSuccess: () => {
+                    setPostData(prev => ({...prev, liked_count: prev.liked_count - 1}));
+                }
+            });
         } else {
-            post(route("like.store", postData));
+            post(route("like.store", postData), {
+                onSuccess: () => {
+                    setPostData(prev => ({...prev, liked_count: prev.liked_count + 1}));
+                }
+            });
         }
     };
 
@@ -259,6 +268,7 @@ const PlayMusic = (props) => {
         post(route("comment.store"), {
             onSuccess: (response) => {
                 setComments(response.props.post.comments);
+                setPostData(prev => ({...prev, comments_count: prev.comments_count + 1}));
             },
         });
     };
