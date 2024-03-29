@@ -39,16 +39,12 @@ export default function UpdatePasswordForm({ className = '' }) {
     return (
         <section className={className}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900">Update Password</h2>
-
-                <p className="mt-1 text-sm text-gray-600">
-                    Ensure your account is using a long, random password to stay secure.
-                </p>
+                <h2 className="text-lg font-medium text-gray-900">パスワード</h2>
             </header>
 
             <form onSubmit={updatePassword} className="mt-6 space-y-6">
                 <div>
-                    <InputLabel htmlFor="current_password" value="Current Password" />
+                    <InputLabel htmlFor="current_password" value="現在のパスワード" />
 
                     <TextInput
                         id="current_password"
@@ -64,7 +60,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="password" value="New Password" />
+                    <InputLabel htmlFor="password" value="新しいパスワード" />
 
                     <TextInput
                         id="password"
@@ -80,7 +76,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
+                    <InputLabel htmlFor="password_confirmation" value="新しいパスワード（確認）" />
 
                     <TextInput
                         id="password_confirmation"

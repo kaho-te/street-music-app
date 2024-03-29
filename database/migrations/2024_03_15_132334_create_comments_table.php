@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->text('text');
             $table->string('music');
+            $table->integer('music_flg');
             $table->foreignId('post_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();

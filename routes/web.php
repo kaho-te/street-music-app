@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/comment', [CommentController::class, 'store'])->name('comment.store');
     Route::post('/comment/{id}', [CommentController::class, 'destroy'])->name('comment.destroy');
     Route::get('/account', [AccountController::class, 'show'])->name('account.show');
+    Route::post('/account', [AccountController::class, 'update'])->name('account.update');
     Route::get('/favoritelist', [PostLikeController::class, 'show'])->name('like.show');
     Route::post('/posts/{post}/like', [PostLikeController::class, 'store'])->name('like.store');
     Route::post('/posts/{post}/dislike', [PostLikeController::class, 'destroy'])->name('like.destroy');

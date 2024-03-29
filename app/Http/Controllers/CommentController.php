@@ -43,6 +43,7 @@ class CommentController extends Controller
         $post = $user->comments()->create([
             'text' => $request->text,
             'music' => $filename,
+            'music_flg' => intval($request->music_flg),
             'post_id' => $request->post_id
         ]);
 

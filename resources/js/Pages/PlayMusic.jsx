@@ -47,20 +47,25 @@ const PlayMusic = (props) => {
     const [file, setFile] = useState();
     const [fileUrl, setFileUrl] = useState();
     const [open, setOpen] = useState(false);
+    const [playingStates, setPlayingStates] = useState({});
     const { data, setData, post } = useForm({
         text: "",
         music: "",
+        music_flg: 0,
         post_id: props.post.id,
         user_id: props.auth.user.id,
     });
 
     useEffect(() => {
         setComments(props.post.comments);
-        setPostData(props.post);
     }, [props.post]);
 
+    useEffect(() => {
+        initializeSession();
+    }, [comments]);
+
     const mainAudioRef = useRef(null);
-    const subAudioRef = useRef(null);
+    const subAudioRef = useRef({});
 
     function handleModalOpen() {
         setOpen(true);
@@ -122,10 +127,9 @@ const PlayMusic = (props) => {
 
     // 録音の停止
     const stopRecording = () => {
-        handleMainPause();
+        handleMainStop();
         if (recorder) {
             recorder.stopRecording(() => {
-                // console.log(recorder);
                 const currentDate = getCurrentDate();
                 const blob = recorder.getBlob();
                 const recordFile = new File(
@@ -164,6 +168,11 @@ const PlayMusic = (props) => {
 
     const handleRadioChange = (e) => {
         setRadio(e.target.value);
+        if (e.target.value == "record") {
+            setData("music_flg", 0);
+        } else {
+            setData("music_flg", 1);
+        }
     };
 
     const handleMainPlay = () => {
@@ -171,31 +180,74 @@ const PlayMusic = (props) => {
         mainAudioRef.current.play();
     };
 
-    const handleMainPause = () => {
+    const handleMainStop = () => {
         mainAudioRef.current.pause();
         mainAudioRef.current.currentTime = 0;
     };
 
-    const handleSubPlay = () => {
-        subAudioRef.current.volume = 0.3;
-        subAudioRef.current.play();
+    const handleSubPlay = (id) => {
+        subAudioRef.current[id].volume = 0.3;
+        subAudioRef.current[id].play();
     };
 
-    const handleSubPause = () => {
-        subAudioRef.current.pause();
-        subAudioRef.current.currentTime = 0;
+    const handleSubStop = (id) => {
+        subAudioRef.current[id].pause();
+        subAudioRef.current[id].currentTime = 0;
     };
 
-    const handleSession = () => {
-        // console.log("再生");
-        handleSubPlay();
+    const initializeSession = () => {
+        const initialStates = {};
+        comments.forEach(comment => {
+            initialStates[comment.id] = 'stopped';
+        });
+        setPlayingStates(initialStates);
+    };
+
+    const handleSession = (music_flg, comment_id) => {
+        initializeSession();
+        let timeout = 0;
+        if (music_flg == 0) {
+            timeout = 100;
+        }
+        handleMainStop();
+        handleSubStop(comment_id);
+
+        handleSubPlay(comment_id);
         setTimeout(() => {
             handleMainPlay();
-        }, 100);
+        }, timeout);
 
-        // document.querySelectorAll('audio').forEach(audio => {
-        //     audio.play();
-        // });
+        setPlayingStates((prevStates) => ({
+            ...prevStates,
+            [comment_id]: "playing",
+        }));
+    };
+
+    const handlePlay = (comment_id) => {
+        handleMainPlay();
+        handleSubPlay(comment_id);
+        setPlayingStates((prevStates) => ({
+            ...prevStates,
+            [comment_id]: "playing",
+        }));
+    };
+
+    const handleStop = (comment_id) => {
+        handleMainStop();
+        handleSubStop(comment_id);
+        setPlayingStates((prevStates) => ({
+            ...prevStates,
+            [comment_id]: "stopped",
+        }));
+    };
+
+    const handlePause = (comment_id) => {
+        mainAudioRef.current.pause();
+        subAudioRef.current[comment_id].pause();
+        setPlayingStates((prevStates) => ({
+            ...prevStates,
+            [comment_id]: "paused",
+        }));
     };
 
     const handleSubmit = (e) => {
@@ -214,7 +266,7 @@ const PlayMusic = (props) => {
     return (
         <div>
             <ModalHeader header="再生" />
-            <div className="mx-3 pt-12 border-dotted border-b-2 border-gray-400">
+            <div className="mx-4 pt-12 border-dotted border-b-2 border-gray-400">
                 <div className="flex items-center mt-2">
                     <img
                         className="mr-2 w-12 h-12"
@@ -247,19 +299,23 @@ const PlayMusic = (props) => {
                         ) : (
                             <FavoriteBorderIcon />
                         )}
-                        <div className="ml-1 text-lg">{postData.liked_count}</div>
+                        <div className="ml-1 text-lg">
+                            {postData.liked_count}
+                        </div>
                     </IconButton>
-                    
+
                     <IconButton type="button" onClick={handleModalOpen}>
                         <LyricsRoundedIcon />
-                        <div className="ml-1 text-lg">{postData.comments_count}</div>
+                        <div className="ml-1 text-lg">
+                            {postData.comments_count}
+                        </div>
                     </IconButton>
                 </div>
             </div>
             {comments.map((comment, index) => (
                 <div
                     key={index}
-                    className="mx-3 py-3 border-dotted border-b-2 border-gray-400"
+                    className="mx-4 py-3 border-dotted border-b-2 border-gray-400"
                 >
                     <div className="mt-2 flex items-center">
                         <img
@@ -279,19 +335,64 @@ const PlayMusic = (props) => {
                     <div className="mt-2">{comment.text}</div>
                     <audio
                         className="my-2"
-                        ref={subAudioRef}
+                        ref={(el) => (subAudioRef.current[comment.id] = el)}
                         controls
                         src={
                             storagePath + comment.user_id + "/" + comment.music
                         }
                     ></audio>
-                    <Button
-                        variant="outlined"
-                        onClick={handleSession}
-                        style={{ color: "#eb3495", borderColor: "#eb3495" }}
-                    >
-                        Session
-                    </Button>
+
+                    {playingStates[comment.id] === "stopped" ? (
+                        <Button
+                            variant="outlined"
+                            onClick={() =>
+                                handleSession(comment.music_flg, comment.id)
+                            }
+                            style={{ color: "#eb3495", borderColor: "#eb3495" }}
+                        >
+                            Session
+                        </Button>
+                    ) : (
+                        <div className="flex">
+                            {playingStates[comment.id] === "paused" ? (
+                                <div className="mx-3">
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => handlePlay(comment.id)}
+                                        style={{
+                                            color: "#eb3495",
+                                            borderColor: "#eb3495",
+                                        }}
+                                    >
+                                        Play
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="mx-3">
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => handlePause(comment.id)}
+                                        style={{
+                                            color: "#eb3495",
+                                            borderColor: "#eb3495",
+                                        }}
+                                    >
+                                        Pause
+                                    </Button>
+                                </div>
+                            )}
+                            <Button
+                                variant="outlined"
+                                onClick={() => handleStop(comment.id)}
+                                style={{
+                                    color: "#eb3495",
+                                    borderColor: "#eb3495",
+                                }}
+                            >
+                                Stop
+                            </Button>
+                        </div>
+                    )}
                 </div>
             ))}
             <div>

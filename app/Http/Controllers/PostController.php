@@ -35,15 +35,12 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->story);
         $userId = auth()->id();
+        $filename = "";
         if ($request->hasFile('music')) {
             $audio = $request->file('music');
             $file = Storage::putFile('public/audio/'.$userId, $audio);
             $filename = basename($file);
-            // $audio->store('public/audio'.$userId);
-        } else {
-            return to_route('posts.index');
         }
         $user = $request->user();
 
