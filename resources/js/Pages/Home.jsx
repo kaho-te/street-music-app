@@ -9,7 +9,6 @@ import SimpleBottomNavigation from "../Components/BottomNavigation";
 import { Button, Modal } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { router, usePage } from "@inertiajs/react";
-import AddMusic from "./AddMusic";
 import Header from "@/Components/Header";
 
 const Home = (props) => {
@@ -71,7 +70,7 @@ const Home = (props) => {
 
     return (
         <>
-        <Header header="音楽MAP"/>
+        <Header header="ホーム"/>
             <LoadScript googleMapsApiKey={apiKey}>
                 <GoogleMap
                     center={position}
@@ -113,7 +112,7 @@ const Home = (props) => {
                 className="add-button"
                 onClick={handleAddMusic}
             >
-                <AddIcon style={{ fontSize: 28 }} className="text-primary" />
+                <AddIcon style={{ fontSize: 28, color: '#e26575' }} />
             </Button>
         </>
     );

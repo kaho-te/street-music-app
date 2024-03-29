@@ -1,8 +1,8 @@
 import SimpleBottomNavigation from "@/Components/BottomNavigation";
 import React from "react";
 import Header from "@/Components/Header";
-import { Box } from "@mui/material";
-import { Link, usePage } from "@inertiajs/react";
+import { Box, Button } from "@mui/material";
+import { Link, router, usePage } from "@inertiajs/react";
 
 const Account = () => {
     const auth = usePage().props.auth;
@@ -18,23 +18,36 @@ const Account = () => {
                         style={{ borderRadius: "50%" }}
                         src={`../storage/image/${user.account.icon}`}
                     />
-                    <Link href={route("profile.edit")}>
+                    <Button
+                        variant="outlined"
+                        onClick={() =>
+                            router.visit(route("profile.edit"), {
+                                method: "get",
+                            })
+                        }
+                        style={{
+                            color: "#f7576b",
+                            borderColor: "#f7576b",
+                        }}
+                    >
                         プロフィールを編集する
-                    </Link>
+                    </Button>
                 </div>
                 <table className="mt-5">
                     <tbody>
-                        <tr>
-                            <th className="text-left w-28">名前</th>
+                        <tr className="">
+                            <th className="text-left w-28 py-3">名前</th>
                             <td>{user.name}</td>
                         </tr>
                         <tr>
-                            <th className="text-left w-28">Email</th>
+                            <th className="text-left w-28 py-3">Email</th>
                             <td>{user.email}</td>
                         </tr>
                         <tr>
-                            <th className="text-left w-28">プロフィール</th>
-                            <td>{user.account.profile}</td>
+                            <th className="text-left w-28 py-3">
+                                プロフィール
+                            </th>
+                            <td className="whitespace-pre-wrap">{user.account.profile}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -43,7 +56,10 @@ const Account = () => {
                     href={route("logout")}
                     method="post"
                     as="button"
-                    className="mt-8"
+                    className="mt-8 font-bold"
+                    style={{
+                        color: "#f7576b",
+                    }}
                 >
                     ログアウト
                 </Link>

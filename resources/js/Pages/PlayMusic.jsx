@@ -16,6 +16,7 @@ import {
     Radio,
     RadioGroup,
     TextField,
+    TextareaAutosize,
     Typography,
 } from "@mui/material";
 import { useForm } from "@inertiajs/react";
@@ -23,6 +24,7 @@ import { MuiFileInput } from "mui-file-input";
 import { useRef } from "react";
 import { useEffect } from "react";
 import EditMenu from "@/Components/EditMenu";
+import InputLabel from "@/Components/InputLabel";
 
 const getCurrentDate = () => {
     const now = new Date();
@@ -87,14 +89,14 @@ const PlayMusic = (props) => {
     // 録音
     const RecButton = ({ isRecording, stopCallback, startCallback }) => (
         <button
-            className="rounded-full w-20 h-20 shadow-lg bg-[#E5671D] hover:bg-[#FFB2A9] duration-300 transition drop-shadow-md active:translate-y-3"
+            className="rounded-full w-20 h-20 shadow-lg bg-[#f7576b] hover:bg-[#FFB2A9] duration-300 transition drop-shadow-md active:translate-y-3"
             onClick={isRecording ? stopCallback : startCallback}
             type="button"
         >
             {isRecording ? (
-                <StopIcon fontSize="large" />
+                <StopIcon style={{ color: "white" }} fontSize="large" />
             ) : (
-                <MicIcon fontSize="large" />
+                <MicIcon style={{ color: "white" }} fontSize="large" />
             )}
         </button>
     );
@@ -160,17 +162,23 @@ const PlayMusic = (props) => {
     };
     const handleLike = (e) => {
         if (props.isLike) {
-            post(route("like.destroy", postData), { 
+            post(route("like.destroy", postData), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    setPostData(prev => ({...prev, liked_count: prev.liked_count - 1}));
-                }
+                    setPostData((prev) => ({
+                        ...prev,
+                        liked_count: prev.liked_count - 1,
+                    }));
+                },
             });
         } else {
             post(route("like.store", postData), {
                 onSuccess: () => {
-                    setPostData(prev => ({...prev, liked_count: prev.liked_count + 1}));
-                }
+                    setPostData((prev) => ({
+                        ...prev,
+                        liked_count: prev.liked_count + 1,
+                    }));
+                },
             });
         }
     };
@@ -206,8 +214,8 @@ const PlayMusic = (props) => {
 
     const initializeSession = () => {
         const initialStates = {};
-        comments.forEach(comment => {
-            initialStates[comment.id] = 'stopped';
+        comments.forEach((comment) => {
+            initialStates[comment.id] = "stopped";
         });
         setPlayingStates(initialStates);
     };
@@ -268,16 +276,19 @@ const PlayMusic = (props) => {
         post(route("comment.store"), {
             onSuccess: (response) => {
                 setComments(response.props.post.comments);
-                setPostData(prev => ({...prev, comments_count: prev.comments_count + 1}));
+                setPostData((prev) => ({
+                    ...prev,
+                    comments_count: prev.comments_count + 1,
+                }));
             },
         });
     };
 
     return (
-        <div>
+        <div className="text-gray-800">
             <ModalHeader header="再生" />
             <div className="mx-4 pt-12 border-dotted border-b-2 border-gray-400">
-                <div className="flex items-center mt-2">
+                <div className="flex items-center mt-4">
                     <img
                         className="mr-2 w-12 h-12"
                         style={{ borderRadius: "50%" }}
@@ -285,8 +296,10 @@ const PlayMusic = (props) => {
                         alt="アイコン"
                     />
                     <div>
-                        <div>{postData.user.name}</div>
-                        <div>{postData.created_at}</div>
+                        <div className="font-bold">{postData.user.name}</div>
+                        <div className="text-gray-500">
+                            {postData.created_at}
+                        </div>
                     </div>
                     {props.auth.user.id === postData.user.id && (
                         <EditMenu target="post" id={postData.id} />
@@ -300,7 +313,7 @@ const PlayMusic = (props) => {
                     ref={mainAudioRef}
                     controls
                     src={storagePath + postData.user_id + "/" + postData.music}
-                    className="mt-2"
+                    className="mt-2 mx-auto"
                 ></audio>
                 <div className="flex justify-around mt-2 ml-2 mr-8">
                     <IconButton type="button" onClick={handleLike}>
@@ -327,84 +340,101 @@ const PlayMusic = (props) => {
                     key={index}
                     className="mx-4 py-3 border-dotted border-b-2 border-gray-400"
                 >
-                    <div className="mt-2 flex items-center">
+                    <div className="mt-2 flex">
                         <img
                             className="mr-2 w-12 h-12"
                             style={{ borderRadius: "50%" }}
                             src={`../storage/image/${comment.user.account.icon}`}
                             alt="アイコン"
                         />
-                        <div>
-                            <div>{comment.user.name}</div>
-                            <div>{comment.created_at}</div>
+                        <div className="w-full">
+                            <div className="flex">
+                                <div>
+                                    <div className="font-bold">
+                                        {comment.user.name}
+                                    </div>
+                                    <div className="text-gray-500">
+                                        {comment.created_at}
+                                    </div>
+                                </div>
+                                {props.auth.user.id === comment.user.id && (
+                                    <div className="ml-auto">
+                                        <EditMenu
+                                            target="comment"
+                                            id={comment.id}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="mt-2">{comment.text}</div>
                         </div>
-                        {props.auth.user.id === comment.user.id && (
-                            <EditMenu target="comment" id={comment.id} />
-                        )}
                     </div>
-                    <div className="mt-2">{comment.text}</div>
+
                     <audio
-                        className="my-2"
+                        className="my-3 mx-auto"
                         ref={(el) => (subAudioRef.current[comment.id] = el)}
                         controls
                         src={
                             storagePath + comment.user_id + "/" + comment.music
                         }
                     ></audio>
-
-                    {playingStates[comment.id] === "stopped" ? (
-                        <Button
-                            variant="outlined"
-                            onClick={() =>
-                                handleSession(comment.music_flg, comment.id)
-                            }
-                            style={{ color: "#eb3495", borderColor: "#eb3495" }}
-                        >
-                            Session
-                        </Button>
-                    ) : (
-                        <div className="flex">
-                            {playingStates[comment.id] === "paused" ? (
-                                <div className="mx-3">
+                    <div className="text-center w-full">
+                        {playingStates[comment.id] === "stopped" ? (
+                            <Button
+                                variant="outlined"
+                                onClick={() =>
+                                    handleSession(comment.music_flg, comment.id)
+                                }
+                                style={{
+                                    color: "#f7576b",
+                                    borderColor: "#f7576b",
+                                }}
+                            >
+                                Session
+                            </Button>
+                        ) : (
+                            <div className="mx-auto">
+                                {playingStates[comment.id] === "paused" ? (
                                     <Button
                                         variant="outlined"
                                         onClick={() => handlePlay(comment.id)}
                                         style={{
-                                            color: "#eb3495",
-                                            borderColor: "#eb3495",
+                                            color: "#f7576b",
+                                            borderColor: "#f7576b",
                                         }}
                                     >
                                         Play
                                     </Button>
-                                </div>
-                            ) : (
-                                <div className="mx-3">
+                                ) : (
                                     <Button
                                         variant="outlined"
                                         onClick={() => handlePause(comment.id)}
                                         style={{
-                                            color: "#eb3495",
-                                            borderColor: "#eb3495",
+                                            color: "#f7576b",
+                                            borderColor: "#f7576b",
                                         }}
                                     >
                                         Pause
                                     </Button>
-                                </div>
-                            )}
-                            <Button
-                                variant="outlined"
-                                onClick={() => handleStop(comment.id)}
-                                style={{
-                                    color: "#eb3495",
-                                    borderColor: "#eb3495",
-                                }}
-                            >
-                                Stop
-                            </Button>
-                        </div>
-                    )}
+                                )}
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => handleStop(comment.id)}
+                                    style={{
+                                        color: "#f7576b",
+                                        borderColor: "#f7576b",
+                                        marginLeft: "12px",
+                                    }}
+                                >
+                                    Stop
+                                </Button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             ))}
+
             <div>
                 <Modal className="" open={open} onClose={handleModalClose}>
                     <div className="bg-white absolute bottom-0 w-full h-2/3 px-3 overflow-y-scroll">
@@ -421,36 +451,39 @@ const PlayMusic = (props) => {
                                         variant="outlined"
                                         color="inherit"
                                         type="submit"
+                                        style={{
+                                            color: "#f7576b",
+                                            borderColor: "#f7576b",
+                                        }}
                                     >
                                         投稿
                                     </Button>
                                 </div>
                             </div>
 
-                            <Typography
-                                variant="body1"
-                                component="h6"
-                                mt={3}
-                                gutterBottom
-                            >
-                                コメント
-                            </Typography>
-                            <TextField
-                                variant="standard"
-                                multiline
-                                className="text w-full"
+                            <InputLabel
+                                htmlFor="comment"
+                                value="コメント"
+                                className="mt-8 text-lg"
+                            />
+                            <TextareaAutosize
+                                id="comment"
+                                minRows={3}
+                                className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                value={data.story}
                                 onChange={(e) =>
                                     setData("text", e.target.value)
                                 }
+                                required
+                                isFocused
+                                autoComplete="comment"
                             />
-                            <Typography
-                                variant="body1"
-                                component="h6"
-                                mt={5}
-                                gutterBottom
-                            >
-                                投稿方法
-                            </Typography>
+
+                            <InputLabel
+                                htmlFor="post"
+                                value="投稿方法"
+                                className="mt-8 text-lg"
+                            />
                             <RadioGroup
                                 defaultValue="record"
                                 row
@@ -488,18 +521,16 @@ const PlayMusic = (props) => {
                             )}
                             {radio === "file" && (
                                 <>
-                                    <Typography
-                                        variant="body1"
-                                        component="h6"
-                                        mt={3}
-                                        gutterBottom
-                                    >
-                                        ファイル選択
-                                    </Typography>
+                                    <InputLabel
+                                        htmlFor="file"
+                                        value="ファイル選択"
+                                        className="mt-8 text-lg"
+                                    />
                                     <MuiFileInput
                                         value={file}
                                         onChange={handleChangeFile}
                                         variant="standard"
+                                        className="w-full"
                                     />
                                     <br />
                                     <Typography
