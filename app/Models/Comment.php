@@ -10,7 +10,7 @@ class Comment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['text','music','post_id'];
+    protected $fillable = ['text','music','music_flg','post_id'];
 
     public function user()
     {
@@ -22,8 +22,15 @@ class Comment extends Model
         return $this->belongsTo(Post::class);
     }
 
-    public function getCreatedAtAttribute($value)
+    /**
+    * 配列/JSONシリアル化の日付を準備
+    *
+    * @param  \DateTimeInterface  $date
+    * @return string
+    */
+    protected function serializeDate(\DateTimeInterface $date)
     {
-        return Carbon::parse($value)->format('Y/m/d H:i:s');
+    return $date->format('Y/m/d H:i:s');
     }
+
 }

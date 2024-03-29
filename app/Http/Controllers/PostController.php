@@ -36,13 +36,11 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $userId = auth()->id();
+        $filename = "";
         if ($request->hasFile('music')) {
             $audio = $request->file('music');
             $file = Storage::putFile('public/audio/'.$userId, $audio);
             $filename = basename($file);
-            // $audio->store('public/audio'.$userId);
-        } else {
-            return to_route('posts.index');
         }
         $user = $request->user();
 
@@ -62,7 +60,12 @@ class PostController extends Controller
      */
     public function show(string $id)
     {
-        $post = Post::where('id', $id)->with('user.account')->with('comments.user.account')->first();
+        $post = Post::where('id', $id)
+            ->with('user.account')
+            ->with('comments.user.account')
+            ->withCount('liked')
+            ->withCount('comments')
+            ->first();
         $isLike = Post::find($id)->liked()->pluck('users.id')->contains(auth()->id());
 
         return Inertia::render('PlayMusic', [
@@ -90,8 +93,11 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy($id)
     {
-        //
+        $music = Post::find($id)->music; 
+        Storage::disk('public')->delete('audio/'.auth()->id().'/'.$music);
+        Post::find($id)->delete();
+        return to_route('posts.index');
     }
 }

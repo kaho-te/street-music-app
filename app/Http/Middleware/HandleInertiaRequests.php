@@ -33,6 +33,7 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $request->user(),
+                'account' => $request->user()?->account,
             ],
             'settings' => [
                 'map_api_key' => env('MIX_API_KEY'),

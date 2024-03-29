@@ -1,1 +1,0 @@
-import{j as t}from"./app-BKVF0Qni.js";import{H as o,S as r}from"./Header-goDl7jex.js";import"./ButtonBase-9Lj1nNSh.js";const i=()=>t.jsxs("div",{children:[t.jsx(o,{header:"アカウント"}),t.jsx(r,{})]});export{i as default};

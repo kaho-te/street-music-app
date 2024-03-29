@@ -34,7 +34,6 @@ const AddMusic = (props) => {
     const [error, setError] = useState("");
     const [recordings, setRecordings] = useState([]);
     const [radio, setRadio] = useState("record");
-    const [address, setAddress] = useState();
 
     const [file, setFile] = useState();
     const [fileUrl, setFileUrl] = useState();
@@ -176,117 +175,122 @@ const AddMusic = (props) => {
 
     return (
         <>
-                    <Box
+            <Box
                 component="form"
                 encType="multipart/form-data"
                 onSubmit={handleSubmit}
             >
-            <div className="py-3 w-full flex items-center justify-center bg-pink-200">
-                <Link className="px-6 absolute left-0" href="/posts">
-                    戻る
-                </Link>
-                <div className="">音楽を設置する</div>
-                <div className="mr-3 absolute right-0">
-                    <Button type={"submit"} variant="outlined" color="inherit">
-                        登録
-                    </Button>
-                </div>
-            </div>
-<div className="px-3">
-                <Typography variant="body1" component="h6" mt={5} gutterBottom>
-                    設置場所
-                </Typography>
-                <TextField
-                    variant="standard"
-                    multiline
-                    className="text w-full"
-                    defaultValue={data.address}
-                    onChange={(e) => setData("address", e.target.value)}
-                />
-                <Typography variant="body1" component="h6" mt={5} gutterBottom>
-                    ストーリー
-                </Typography>
-                <TextField
-                    variant="standard"
-                    multiline
-                    className="text w-full"
-                    onChange={(e) => setData("story", e.target.value)}
-                />
-                <Typography variant="body1" component="h6" mt={5} gutterBottom>
-                    投稿方法
-                </Typography>
-                <RadioGroup
-                    defaultValue="record"
-                    row
-                    onChange={handleRadioChange}
-                >
-                    <FormControlLabel
-                        value="record"
-                        control={<Radio />}
-                        label="録音"
+                <ModalHeader header="音楽を設置する"/>
+                <div className="px-3 pt-8">
+                    <Typography
+                        variant="body1"
+                        component="h6"
+                        mt={5}
+                        gutterBottom
+                    >
+                        設置場所
+                    </Typography>
+                    <TextField
+                        variant="standard"
+                        multiline
+                        className="text w-full"
+                        defaultValue={data.address}
+                        onChange={(e) => setData("address", e.target.value)}
                     />
-                    <FormControlLabel
-                        value="file"
-                        control={<Radio />}
-                        label="ファイルアップロード"
+                    <Typography
+                        variant="body1"
+                        component="h6"
+                        mt={5}
+                        gutterBottom
+                    >
+                        ストーリー
+                    </Typography>
+                    <TextField
+                        variant="standard"
+                        multiline
+                        className="text w-full"
+                        onChange={(e) => setData("story", e.target.value)}
                     />
-                </RadioGroup>
-                {radio === "record" && (
-                    <>
-                        {/* 録音コンポーネント */}
-                        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 flex flex-col justify-center items-center z-50 w-375 py-16">
-                            <RecButton
-                                isRecording={isRecording}
-                                stopCallback={stopRecording}
-                                startCallback={startRecording}
-                            />
-                        </div>
-                    </>
-                )}
-                {radio === "file" && (
-                    <>
-                        <Typography
-                            variant="body1"
-                            component="h6"
-                            mt={5}
-                            gutterBottom
-                        >
-                            ファイル選択
-                        </Typography>
-                        <MuiFileInput
-                            value={file}
-                            onChange={handleChangeFile}
-                            variant="standard"
+                    <Typography
+                        variant="body1"
+                        component="h6"
+                        mt={5}
+                        gutterBottom
+                    >
+                        投稿方法
+                    </Typography>
+                    <RadioGroup
+                        defaultValue="record"
+                        row
+                        onChange={handleRadioChange}
+                    >
+                        <FormControlLabel
+                            value="record"
+                            control={<Radio />}
+                            label="録音"
                         />
-                        <br />
-                        <Typography
-                            variant="caption"
-                            component="div"
-                            gutterBottom
-                        >
-                            MP3/WAV ファイルのみ。
-                        </Typography>
-                        {file &&
-                            !(
-                                file.type === "audio/mpeg" ||
-                                file.type === "audio/wav" ||
-                                file.type === "audio/webm"
-                            ) && (
-                                <Typography
-                                    variant="caption"
-                                    component="div"
-                                    color="error.main"
-                                    gutterBottom
-                                >
-                                    このファイルタイプはサポートしていません。
-                                </Typography>
-                            )}
-                    </>
-                )}
+                        <FormControlLabel
+                            value="file"
+                            control={<Radio />}
+                            label="ファイルアップロード"
+                        />
+                    </RadioGroup>
+                    {radio === "record" && (
+                        <>
+                            {/* 録音コンポーネント */}
+                            <div className="fixed bottom-0 left-1/2 -translate-x-1/2 flex flex-col justify-center items-center z-50 w-375 py-16">
+                                <RecButton
+                                    isRecording={isRecording}
+                                    stopCallback={stopRecording}
+                                    startCallback={startRecording}
+                                />
+                            </div>
+                        </>
+                    )}
+                    {radio === "file" && (
+                        <>
+                            <Typography
+                                variant="body1"
+                                component="h6"
+                                mt={5}
+                                gutterBottom
+                            >
+                                ファイル選択
+                            </Typography>
+                            <MuiFileInput
+                                value={file}
+                                onChange={handleChangeFile}
+                                variant="standard"
+                            />
+                            <br />
+                            <Typography
+                                variant="caption"
+                                component="div"
+                                gutterBottom
+                            >
+                                MP3/WAV ファイルのみ。
+                            </Typography>
+                            {file &&
+                                !(
+                                    file.type === "audio/mpeg" ||
+                                    file.type === "audio/wav" ||
+                                    file.type === "audio/webm"
+                                ) && (
+                                    <Typography
+                                        variant="caption"
+                                        component="div"
+                                        color="error.main"
+                                        gutterBottom
+                                    >
+                                        このファイルタイプはサポートしていません。
+                                    </Typography>
+                                )}
+                        </>
+                    )}
 
-                <div className="mt-3">
-                    <audio controls={true} src={fileUrl}></audio>
-                </div>
+                    <div className="mt-3">
+                        <audio controls={true} src={fileUrl}></audio>
+                    </div>
                 </div>
             </Box>
         </>

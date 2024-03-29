@@ -9,6 +9,8 @@ class Account extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['icon','profile'];
+
     public function user()
     {
         return $this->belongsTo(User::class);
