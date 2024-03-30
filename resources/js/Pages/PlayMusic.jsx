@@ -198,8 +198,13 @@ const PlayMusic = (props) => {
     };
 
     const handleMainStop = () => {
-        mainAudioRef.current.pause();
-        mainAudioRef.current.currentTime = 0;
+        return new Promise((resolve) => {
+            if (mainAudioRef.current) {
+                mainAudioRef.current.pause();
+                mainAudioRef.current.currentTime = 0;
+            }
+            resolve();
+        });
     };
 
     const handleSubPlay = (id) => {
@@ -208,31 +213,33 @@ const PlayMusic = (props) => {
     };
 
     const handleSubStop = (id) => {
-        subAudioRef.current[id].pause();
-        subAudioRef.current[id].currentTime = 0;
+        return new Promise((resolve) => {
+            if (subAudioRef.current[id]) {
+                subAudioRef.current[id].pause();
+                subAudioRef.current[id].currentTime = 0;
+            }
+            resolve();
+        });
     };
 
     const initializeSession = () => {
-        const initialStates = {};
-        comments.forEach((comment) => {
-            initialStates[comment.id] = "stopped";
+        return new Promise((resolve) => {
+            const initialStates = {};
+            comments.forEach((comment) => {
+                initialStates[comment.id] = "stopped";
+            });
+            setPlayingStates(initialStates);
+            resolve();
         });
-        setPlayingStates(initialStates);
     };
 
-    const handleSession = (music_flg, comment_id) => {
-        initializeSession();
-        let timeout = 0;
-        if (music_flg == 0) {
-            timeout = 100;
-        }
-        handleMainStop();
-        handleSubStop(comment_id);
+    const handleSession = async(music_flg, comment_id) => {
+        await initializeSession();
+        await handleMainStop();
+        await handleSubStop(comment_id);
 
         handleSubPlay(comment_id);
-        setTimeout(() => {
-            handleMainPlay();
-        }, timeout);
+        handleMainPlay();
 
         setPlayingStates((prevStates) => ({
             ...prevStates,
@@ -302,7 +309,7 @@ const PlayMusic = (props) => {
                         </div>
                     </div>
                     {props.auth.user.id === postData.user.id && (
-                        <EditMenu target="post" id={postData.id} />
+                        <EditMenu target="post" id={postData.id} postData={postData} setPostData={setPostData} />
                     )}
                 </div>
 
@@ -362,6 +369,8 @@ const PlayMusic = (props) => {
                                         <EditMenu
                                             target="comment"
                                             id={comment.id}
+                                            postData={postData}
+                                            setPostData={setPostData}
                                         />
                                     </div>
                                 )}

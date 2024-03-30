@@ -28,6 +28,9 @@ const EditMenu = (props) => {
                 route("comment.destroy", props.id),
                 {
                     onBefore: () => confirm("本当に削除しますか?"),
+                    onSuccess: () => {
+                        props.setPostData(prev => ({...prev, comments_count: prev.comments_count - 1}));
+                    }
                 }
             );
         }
