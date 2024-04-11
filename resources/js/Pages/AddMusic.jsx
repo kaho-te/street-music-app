@@ -93,6 +93,7 @@ const AddMusic = (props) => {
                 type: "audio",
                 recorderType: StereoAudioRecorder,
                 mimeType: "audio/wav",
+                autoGainControl: false,
             });
             newRecorder.startRecording();
             setRecorder(newRecorder);
@@ -182,7 +183,7 @@ const AddMusic = (props) => {
                 encType="multipart/form-data"
                 onSubmit={handleSubmit}
             >
-                <ModalHeader header="音楽を設置する" />
+                <ModalHeader header="音楽を投稿する" />
                 <div className="px-3 pt-12">
                     <InputLabel
                         htmlFor="address"

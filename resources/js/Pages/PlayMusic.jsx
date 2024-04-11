@@ -3,6 +3,7 @@ import React from "react";
 import LyricsRoundedIcon from "@mui/icons-material/LyricsRounded";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import MusicNoteIcon from "@mui/icons-material/MusicNote";
 import RecordRTC, { StereoAudioRecorder } from "recordrtc";
 import MicIcon from "@mui/icons-material/Mic";
 import StopIcon from "@mui/icons-material/Stop";
@@ -19,7 +20,7 @@ import {
     TextareaAutosize,
     Typography,
 } from "@mui/material";
-import { useForm } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 import { MuiFileInput } from "mui-file-input";
 import { useRef } from "react";
 import { useEffect } from "react";
@@ -115,6 +116,7 @@ const PlayMusic = (props) => {
                 type: "audio",
                 recorderType: StereoAudioRecorder,
                 mimeType: "audio/wav",
+                autoGainControl: false, // この行を追加
             });
             newRecorder.startRecording();
             handleMainPlay();
@@ -193,8 +195,12 @@ const PlayMusic = (props) => {
     };
 
     const handleMainPlay = () => {
-        mainAudioRef.current.volume = 0.3;
-        mainAudioRef.current.play();
+        return new Promise((resolve) => {
+            mainAudioRef.current.volume = 0.3;
+            mainAudioRef.current.play().then(() => {
+                resolve();
+            });
+        });
     };
 
     const handleMainStop = () => {
@@ -208,8 +214,12 @@ const PlayMusic = (props) => {
     };
 
     const handleSubPlay = (id) => {
-        subAudioRef.current[id].volume = 0.3;
-        subAudioRef.current[id].play();
+        return new Promise((resolve) => {
+            subAudioRef.current[id].volume = 0.3;
+            subAudioRef.current[id].play().then(() => {
+                resolve();
+            });
+        });
     };
 
     const handleSubStop = (id) => {
@@ -233,13 +243,12 @@ const PlayMusic = (props) => {
         });
     };
 
-    const handleSession = async(music_flg, comment_id) => {
+    const handleSession = async (music_flg, comment_id) => {
         await initializeSession();
         await handleMainStop();
         await handleSubStop(comment_id);
 
-        handleSubPlay(comment_id);
-        handleMainPlay();
+        await Promise.all([handleSubPlay(comment_id), handleMainPlay()]);
 
         setPlayingStates((prevStates) => ({
             ...prevStates,
@@ -296,25 +305,37 @@ const PlayMusic = (props) => {
             <ModalHeader header="再生" />
             <div className="mx-4 pt-12 border-dotted border-b-2 border-gray-400">
                 <div className="flex items-center mt-4">
-                    <img
-                        className="mr-2 w-12 h-12"
-                        style={{ borderRadius: "50%" }}
-                        src={`../storage/image/${postData.user.account.icon}`}
-                        alt="アイコン"
-                    />
-                    <div>
-                        <div className="font-bold">{postData.user.name}</div>
-                        <div className="text-gray-500">
-                            {postData.created_at}
+                    <Link
+                        className="flex items-center"
+                        href={route("account.others", { id: postData.user.id })}
+                    >
+                        <img
+                            className="mr-2 w-12 h-12"
+                            style={{ borderRadius: "50%" }}
+                            src={`../storage/image/${postData.user.account.icon}`}
+                            alt="アイコン"
+                        />
+                        <div>
+                            <div className="font-bold">
+                                {postData.user.name}
+                            </div>
+                            <div className="text-gray-500">
+                                {postData.created_at}
+                            </div>
                         </div>
-                    </div>
+                    </Link>
                     {props.auth.user.id === postData.user.id && (
-                        <EditMenu target="post" id={postData.id} postData={postData} setPostData={setPostData} />
+                        <EditMenu
+                            target="post"
+                            id={postData.id}
+                            postData={postData}
+                            setPostData={setPostData}
+                        />
                     )}
                 </div>
 
-                <div className="mt-2">{postData.address}</div>
-                <div className="mt-2">{postData.story}</div>
+                <div className="mt-2 text-gray-500">{postData.address}</div>
+                <div className="mt-2 whitespace-pre-wrap">{postData.story}</div>
                 <audio
                     id="main"
                     ref={mainAudioRef}
@@ -335,7 +356,7 @@ const PlayMusic = (props) => {
                     </IconButton>
 
                     <IconButton type="button" onClick={handleModalOpen}>
-                        <LyricsRoundedIcon />
+                        <MusicNoteIcon />
                         <div className="ml-1 text-lg">
                             {postData.comments_count}
                         </div>
@@ -348,12 +369,19 @@ const PlayMusic = (props) => {
                     className="mx-4 py-3 border-dotted border-b-2 border-gray-400"
                 >
                     <div className="mt-2 flex">
-                        <img
-                            className="mr-2 w-12 h-12"
-                            style={{ borderRadius: "50%" }}
-                            src={`../storage/image/${comment.user.account.icon}`}
-                            alt="アイコン"
-                        />
+                        <Link
+                            className="items-center align-top mr-2"
+                            href={route("account.others", {
+                                id: comment.user_id,
+                            })}
+                        >
+                            <img
+                                className="mr-2 w-12 h-12 "
+                                style={{ borderRadius: "50%" }}
+                                src={`../storage/image/${comment.user.account.icon}`}
+                                alt="アイコン"
+                            />
+                        </Link>
                         <div className="w-full">
                             <div className="flex">
                                 <div>
@@ -454,7 +482,7 @@ const PlayMusic = (props) => {
                             className="px-3"
                         >
                             <div className="py-3 w-full flex items-center justify-center">
-                                <div className="">コメントを書く</div>
+                                <div className="">セッション</div>
                                 <div className="mr-3 absolute right-0">
                                     <Button
                                         variant="outlined"

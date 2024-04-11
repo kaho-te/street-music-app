@@ -8,19 +8,19 @@ import { styled } from "@mui/material/styles";
 import { useState } from "react";
 import { router } from "@inertiajs/react";
 import { useLocation } from "react-router-dom";
-import QueueMusicIcon from '@mui/icons-material/QueueMusic';
+import QueueMusicIcon from "@mui/icons-material/QueueMusic";
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
 export default function SimpleBottomNavigation(props) {
-
     // アクセス時のURLを解析して、適切なナビゲーションボタンをアクティブにする。
     const [value, setValue] = useState(window.location.pathname.slice(1));
 
     const TabBarButton = styled(BottomNavigationAction)({
-        color: 'gray',
-        '&.Mui-selected': {
-          color: '#e26575',
+        color: "gray",
+        "&.Mui-selected": {
+            color: "#e26575",
         },
-      });
+    });
 
     return (
         <>
@@ -36,19 +36,34 @@ export default function SimpleBottomNavigation(props) {
                     value="posts"
                     label="ホーム"
                     icon={<HomeIcon />}
-                    onClick={() => router.visit(route("posts.index"),{method:"get"})}
+                    onClick={() =>
+                        router.visit(route("posts.index"), { method: "get" })
+                    }
                 />
                 <TabBarButton
                     value="favoritelist"
                     label="お気に入り"
-                    icon={<QueueMusicIcon/>}
-                    onClick={() => router.visit(route("like.show"),{method:"get"})}
+                    icon={<QueueMusicIcon />}
+                    onClick={() =>
+                        router.visit(route("like.show"), { method: "get" })
+                    }
+                />
+                <TabBarButton
+                    value="chat"
+                    label="メッセージ"
+                    icon={<MailOutlineIcon />}
+                    onClick={() =>
+                        // router.visit(route("chat.index"), { method: "get" })
+                        console.log("メッセージ")
+                    }
                 />
                 <TabBarButton
                     value="account"
                     label="アカウント"
                     icon={<PersonIcon />}
-                    onClick={() => router.visit(route("account.show"),{method:"get"})}
+                    onClick={() =>
+                        router.visit(route("account.show"), { method: "get" })
+                    }
                 />
             </BottomNavigation>
         </>

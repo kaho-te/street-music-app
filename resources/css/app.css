@@ -1,3 +1,46 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* チャットメッセージのスタイル */
+.chat-message {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.chat-message .message-content {
+    max-width: 60%;
+    padding: 10px;
+    border-radius: 20px;
+    margin-bottom: 5px;
+}
+
+/* 送信者（自分）のメッセージスタイル */
+.chat-message.sent .message-content {
+    background-color: #fddae1;
+    margin-left: auto;
+    border-bottom-right-radius: 5px;
+}
+
+/* 受信者のメッセージスタイル */
+.chat-message.received .message-content {
+    background-color: #ffffff;
+    margin-right: auto;
+    border-bottom-left-radius: 5px;
+}
+
+/* メッセージのテキスト */
+.chat-message .message-text {
+    word-wrap: break-word;
+}
+
+/* メッセージの日付 */
+.chat-message.sent .message-date {
+    font-size: 12px;
+    text-align: right;
+}
+.chat-message.received .message-date {
+  font-size: 12px;
+  text-align: left;
+}

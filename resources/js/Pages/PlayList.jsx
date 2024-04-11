@@ -37,7 +37,7 @@ const PlayList = (props) => {
                             </div>
 
                             <div className="mt-2">{favorite.address}</div>
-                            <div className="mt-2">{favorite.story}</div>
+                            <div className="mt-2 whitespace-pre-wrap">{favorite.story}</div>
                             <audio
                                 className="mt-2 mb-4 mx-auto"
                                 controls

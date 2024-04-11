@@ -16,7 +16,7 @@ const ModalHeader = (props) => {
             </Box>
 
             <div className="">{props.header}</div>
-            {props.header === "音楽を設置する" && (
+            {props.header === "音楽を投稿する" && (
                 <div className="mr-3 absolute right-0">
                     <Button type={"submit"} variant="outlined" color="inherit" style={{fontWeight: 'bold'}}>
                         確定

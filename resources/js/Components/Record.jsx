@@ -1,13 +1,5 @@
 import { useState, useEffect } from "react";
 import RecordRTC from "recordrtc";
-// import { Microphone } from "./icon/microphone";
-
-// type Recording = {
-//   audioURL: string;
-//   blob: Blob;
-//   id: string;
-//   recDate: string;
-// };
 
 const getCurrentDate = () => {
   const now = new Date();
@@ -25,7 +17,6 @@ export const Record = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState("");
   const [recordings, setRecordings] = useState([]);
-  // const { onStart, onStop, transcripts } = useSpeechRecognition();
 
   // 録音の開始
   const startRecording = async () => {
