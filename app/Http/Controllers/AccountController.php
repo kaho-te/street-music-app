@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use App\Models\User;
+use App\Models\Post;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Response;
 
@@ -87,5 +88,26 @@ class AccountController extends Controller
     public function destroy(Account $account)
     {
         //
+    }
+
+    public function showOthers($id)
+    {
+        $account = User::where('id', $id)
+        ->with('account')
+        ->first();
+
+        $posts = Post::where('user_id', $id)
+        ->with('user.account')
+        ->withCount(['liked as isLike' => function($query){
+            $query->where('user_id', auth()->id());
+        }])
+        ->withCount('liked')
+        ->withCount('comments')
+        ->get();
+
+        return Inertia::render('OtherAccount', [
+            'account' => $account,
+            'posts' => $posts
+        ]);
     }
 }

@@ -1,15 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../../css/app.css";
-import {
-    GoogleMap,
-    LoadScript,
-    Marker,
-} from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import SimpleBottomNavigation from "../Components/BottomNavigation";
 import { Button, Modal } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { router, usePage } from "@inertiajs/react";
-import AddMusic from "./AddMusic";
 import Header from "@/Components/Header";
 
 const Home = (props) => {
@@ -30,9 +25,9 @@ const Home = (props) => {
     // useEffectが実行されているかどうかを判定
     const isFirstRef = useRef(true);
 
-    // 星形のアイコンを作成
+    // 音源のアイコンを作成
     const icon = {
-        url: "https://maps.google.com/mapfiles/kml/pal4/icon47.png", // 現在地アイコンのURL
+        url: "../storage/image/kkrn_icon_onpu_10.png",
     };
 
     const apiKey = usePage().props.settings.map_api_key;
@@ -52,7 +47,6 @@ const Home = (props) => {
         });
     }, [isFirstRef]);
 
-
     function handleMapClick(event) {
         setMarker({
             lat: event.latLng.lat(),
@@ -66,12 +60,12 @@ const Home = (props) => {
 
     const handleMarkerClick = (post) => {
         // router.visit(route("playmusic", post.id));
-        router.get(route('post.show', post.id));
-    }
+        router.get(route("post.show", post.id));
+    };
 
     return (
         <>
-        <Header header="音楽MAP"/>
+            <Header header="ホーム" />
             <LoadScript googleMapsApiKey={apiKey}>
                 <GoogleMap
                     center={position}
@@ -92,9 +86,11 @@ const Home = (props) => {
                                 lat: Number(post.latitude),
                                 lng: Number(post.longitude),
                             }}
+                            icon={icon}
                             onClick={() => handleMarkerClick(post)}
                         />
                     ))}
+
                 </GoogleMap>
             </LoadScript>
             <SimpleBottomNavigation />
@@ -113,7 +109,7 @@ const Home = (props) => {
                 className="add-button"
                 onClick={handleAddMusic}
             >
-                <AddIcon style={{ fontSize: 28 }} className="text-primary" />
+                <AddIcon style={{ fontSize: 28, color: "#e26575" }} />
             </Button>
         </>
     );

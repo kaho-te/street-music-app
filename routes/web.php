@@ -5,6 +5,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ChatController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -45,9 +46,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/comment/{id}', [CommentController::class, 'destroy'])->name('comment.destroy');
     Route::get('/account', [AccountController::class, 'show'])->name('account.show');
     Route::post('/account', [AccountController::class, 'update'])->name('account.update');
+    Route::get('/account/{id}', [AccountController::class, 'showOthers'])->name('account.others');
     Route::get('/favoritelist', [PostLikeController::class, 'show'])->name('like.show');
     Route::post('/posts/{post}/like', [PostLikeController::class, 'store'])->name('like.store');
     Route::post('/posts/{post}/dislike', [PostLikeController::class, 'destroy'])->name('like.destroy');
+});
+
+Route::prefix('chat')->middleware('auth')->controller(ChatController::class)->group(function(){
+    Route::get('/{id}', 'index')->name('chat.index');
+    Route::get('/list/{id}', 'list')->name('chat.list');
+    Route::post('/', 'store')->name('chat.store');
+
 });
 
 require __DIR__.'/auth.php';

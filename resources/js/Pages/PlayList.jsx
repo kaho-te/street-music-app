@@ -19,7 +19,7 @@ const PlayList = (props) => {
                             href={route("post.show", favorite.id)}
                             underline="none"
                         >
-                            <div className="my-2 flex items-center">
+                            <div className="mt-4 flex items-center">
                                 <img
                                     className="mr-2 w-12 h-12"
                                     style={{ borderRadius: "50%" }}
@@ -27,15 +27,19 @@ const PlayList = (props) => {
                                     alt="アイコン"
                                 />
                                 <div>
-                                    <div>{favorite.user.name}</div>
-                                    <div>{favorite.created_at}</div>
+                                    <div className="font-bold">
+                                        {favorite.user.name}
+                                    </div>
+                                    <div className="text-gray-500">
+                                        {favorite.created_at}
+                                    </div>
                                 </div>
                             </div>
 
-                            <div>{favorite.address}</div>
-                            <div>{favorite.story}</div>
+                            <div className="mt-2">{favorite.address}</div>
+                            <div className="mt-2 whitespace-pre-wrap">{favorite.story}</div>
                             <audio
-                                className="my-2"
+                                className="mt-2 mb-4 mx-auto"
                                 controls
                                 src={
                                     storagePath +

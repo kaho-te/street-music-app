@@ -16,6 +16,8 @@ import MicIcon from "@mui/icons-material/Mic";
 import StopIcon from "@mui/icons-material/Stop";
 import { Link, useForm, usePage } from "@inertiajs/react";
 import ModalHeader from "@/Components/ModalHeader";
+import InputLabel from "@/Components/InputLabel";
+import TextInput from "@/Components/TextInput";
 
 const getCurrentDate = (props) => {
     const now = new Date();
@@ -65,14 +67,14 @@ const AddMusic = (props) => {
     // 録音
     const RecButton = ({ isRecording, stopCallback, startCallback }) => (
         <button
-            className="rounded-full w-20 h-20 shadow-lg bg-[#E5671D] hover:bg-[#FFB2A9] duration-300 transition drop-shadow-md active:translate-y-3"
+            className="rounded-full w-20 h-20 shadow-lg bg-[#e26575] hover:bg-[#f0b5bd] duration-300 transition drop-shadow-md active:translate-y-3"
             onClick={isRecording ? stopCallback : startCallback}
             type="button"
         >
             {isRecording ? (
-                <StopIcon fontSize="large" />
+                <StopIcon style={{ color: "white" }} fontSize="large" />
             ) : (
-                <MicIcon fontSize="large" />
+                <MicIcon style={{ color: "white" }} fontSize="large" />
             )}
         </button>
     );
@@ -91,6 +93,7 @@ const AddMusic = (props) => {
                 type: "audio",
                 recorderType: StereoAudioRecorder,
                 mimeType: "audio/wav",
+                autoGainControl: false,
             });
             newRecorder.startRecording();
             setRecorder(newRecorder);
@@ -180,45 +183,43 @@ const AddMusic = (props) => {
                 encType="multipart/form-data"
                 onSubmit={handleSubmit}
             >
-                <ModalHeader header="音楽を設置する"/>
-                <div className="px-3 pt-8">
-                    <Typography
-                        variant="body1"
-                        component="h6"
-                        mt={5}
-                        gutterBottom
-                    >
-                        設置場所
-                    </Typography>
-                    <TextField
-                        variant="standard"
-                        multiline
-                        className="text w-full"
-                        defaultValue={data.address}
+                <ModalHeader header="音楽を投稿する" />
+                <div className="px-3 pt-12">
+                    <InputLabel
+                        htmlFor="address"
+                        value="設置場所"
+                        className="mt-8 text-lg"
+                    />
+                    <TextareaAutosize
+                        id="address"
+                        minRows={3}
+                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                        value={data.address}
                         onChange={(e) => setData("address", e.target.value)}
+                        required
+                        isFocused
+                        autoComplete="address"
                     />
-                    <Typography
-                        variant="body1"
-                        component="h6"
-                        mt={5}
-                        gutterBottom
-                    >
-                        ストーリー
-                    </Typography>
-                    <TextField
-                        variant="standard"
-                        multiline
-                        className="text w-full"
+                    <InputLabel
+                        htmlFor="story"
+                        value="ストーリー"
+                        className="mt-8 text-lg"
+                    />
+                    <TextareaAutosize
+                        id="story"
+                        minRows={3}
+                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                        value={data.story}
                         onChange={(e) => setData("story", e.target.value)}
+                        required
+                        isFocused
+                        autoComplete="story"
                     />
-                    <Typography
-                        variant="body1"
-                        component="h6"
-                        mt={5}
-                        gutterBottom
-                    >
-                        投稿方法
-                    </Typography>
+                    <InputLabel
+                        htmlFor="post"
+                        value="投稿方法"
+                        className="mt-8 text-lg"
+                    />
                     <RadioGroup
                         defaultValue="record"
                         row
@@ -249,18 +250,17 @@ const AddMusic = (props) => {
                     )}
                     {radio === "file" && (
                         <>
-                            <Typography
-                                variant="body1"
-                                component="h6"
-                                mt={5}
-                                gutterBottom
-                            >
-                                ファイル選択
-                            </Typography>
+                            <InputLabel
+                                htmlFor="file"
+                                value="ファイル選択"
+                                className="mt-8 text-lg"
+                            />
                             <MuiFileInput
                                 value={file}
                                 onChange={handleChangeFile}
                                 variant="standard"
+                                required
+                                className="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
                             />
                             <br />
                             <Typography

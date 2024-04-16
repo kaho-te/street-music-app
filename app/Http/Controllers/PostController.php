@@ -6,6 +6,7 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use FFMpeg\FFMpeg;
 
 class PostController extends Controller
 {
@@ -38,9 +39,18 @@ class PostController extends Controller
         $userId = auth()->id();
         $filename = "";
         if ($request->hasFile('music')) {
-            $audio = $request->file('music');
-            $file = Storage::putFile('public/audio/'.$userId, $audio);
-            $filename = basename($file);
+            $wavAudio = $request->file('music');
+            $wavPath = $wavAudio->getPathname();
+            // $file = Storage::putFile('public/audio/'.$userId, $audio);
+            // 出力ファイルのパスを設定
+            $outputPath = storage_path('app/public/audio/') . $userId . '/' . uniqid() . '.mp3';
+
+            // FFMpegを使用してWAVをMP3に変換
+            $ffmpeg = FFMpeg::create();
+            $audio = $ffmpeg->open($wavPath);
+            $format = new \FFMpeg\Format\Audio\Mp3();
+            $audio->save($format, $outputPath);
+            $filename = basename($outputPath);
         }
         $user = $request->user();
 
@@ -51,7 +61,7 @@ class PostController extends Controller
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
         ]);
-        // return response()->json(['success' => false], 400);
+
         return to_route('posts.index');
     }
 

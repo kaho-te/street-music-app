@@ -3,7 +3,7 @@ import React from 'react'
 
 const Header = (props) => {
   return (
-    <div className="fixed z-10 py-3 w-full flex items-center justify-center bg-pink-200">
+    <div className="fixed z-10 py-3 w-full flex items-center justify-center bg-[#e26575] text-white font-bold text-lg">
 
       <div className="">{props.header}</div>
     </div>

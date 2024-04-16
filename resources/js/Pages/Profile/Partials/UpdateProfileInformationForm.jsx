@@ -18,17 +18,15 @@ export default function UpdateProfileInformation({
     const imgPath = storagePath + account.icon;
     const [file, setFile] = useState(imgPath);
 
-    const { data, setData, post ,errors, processing, recentlySuccessful } =
+    const { data, setData, post, errors, processing, recentlySuccessful } =
         useForm({
             name: user.name,
             email: user.email,
             profile: account.profile,
-            icon: account.icon
+            icon: account.icon,
         });
 
-        
     const handleChangeImg = (e) => {
-
         setData("icon", e.target.files[0]);
 
         const reader = new FileReader();
@@ -54,16 +52,27 @@ export default function UpdateProfileInformation({
                     プロフィール
                 </h2>
             </header>
-            <form encType="multipart/form-data" onSubmit={submit} className="mt-6 space-y-6">
+            <form
+                encType="multipart/form-data"
+                onSubmit={submit}
+                className="mt-6 space-y-6"
+            >
                 <div>
-                    <InputLabel htmlFor="icon" value="アイコン" />
                     <div className="text-center mb-4">
                         <img
                             className="mx-auto my-3 w-32"
                             style={{ borderRadius: "50%" }}
                             src={file}
                         />
-                        <Button variant="contained" component="label">
+
+                        <Button
+                            variant="outlined"
+                            component="label"
+                            style={{
+                                color: "#f7576b",
+                                borderColor: "#f7576b",
+                            }}
+                        >
                             ファイルを選択
                             <input
                                 id="icon"
