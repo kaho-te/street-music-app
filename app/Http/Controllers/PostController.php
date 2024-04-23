@@ -6,7 +6,7 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-use FFMpeg\FFMpeg;
+// use FFMpeg\FFMpeg;
 
 class PostController extends Controller
 {
@@ -41,16 +41,21 @@ class PostController extends Controller
         if ($request->hasFile('music')) {
             $wavAudio = $request->file('music');
             $wavPath = $wavAudio->getPathname();
-            // $file = Storage::putFile('public/audio/'.$userId, $audio);
+            $outputPath = 'public/audio/'.$userId;
             // 出力ファイルのパスを設定
-            $outputPath = storage_path('app/public/audio/') . $userId . '/' . uniqid() . '.mp3';
+            // $outputDir = storage_path('app/public/audio/') . $userId;
+            // $outputPath = storage_path('app/public/audio/') . $userId . '/' . uniqid() . '.mp3';
 
+            if(!Storage::exists($outputPath)){
+                Storage::makeDirectory($outputPath);
+            }
             // FFMpegを使用してWAVをMP3に変換
-            $ffmpeg = FFMpeg::create();
-            $audio = $ffmpeg->open($wavPath);
-            $format = new \FFMpeg\Format\Audio\Mp3();
-            $audio->save($format, $outputPath);
-            $filename = basename($outputPath);
+            // $ffmpeg = FFMpeg::create();
+            // $audio = $ffmpeg->open($wavPath);
+            // $format = new \FFMpeg\Format\Audio\Mp3();
+            // $audio->save($format, $outputPath);
+            $file = Storage::putFile($outputPath, $wavAudio);
+            $filename = basename($file);
         }
         $user = $request->user();
 
