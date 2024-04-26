@@ -20,6 +20,9 @@ return new class extends Migration
             $table->decimal('latitude',9,6);
             $table->decimal('longitude',9,6);
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('instrument_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('r_instrument_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('genre_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

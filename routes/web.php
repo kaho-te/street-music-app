@@ -50,6 +50,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/favoritelist', [PostLikeController::class, 'show'])->name('like.show');
     Route::post('/posts/{post}/like', [PostLikeController::class, 'store'])->name('like.store');
     Route::post('/posts/{post}/dislike', [PostLikeController::class, 'destroy'])->name('like.destroy');
+    Route::get('/streetmap', [PostController::class, 'get_posts'])->name('post.map');
 });
 
 Route::prefix('chat')->middleware('auth')->controller(ChatController::class)->group(function(){

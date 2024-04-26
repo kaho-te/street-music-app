@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Instrument;
+use App\Models\Genre;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -15,8 +17,27 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::get();
+        $posts = Post::with('user.account')
+        ->with('instrument')
+        ->with('genre')
+        ->latest()->get();
+        return Inertia::render('Timeline', [
+            'posts' => $posts
+        ]);
+    }
+
+    public function get_posts()
+    {
+        $posts = Post::with('user.account')->latest()->get();
         return Inertia::render('Home', [
+            'posts' => $posts
+        ]);
+    }
+
+    public function search()
+    {
+        $posts = Post::with('user.account')->latest()->get();
+        return Inertia::render('Timeline', [
             'posts' => $posts
         ]);
     }
@@ -26,8 +47,11 @@ class PostController extends Controller
      */
     public function create(Request $request)
     {
-        return Inertia::render('AddMusic',[
-            'position' => $request
+        $instruments = Instrument::orderBy('id')->get();
+        $genres = Genre::orderBy('id')->get();
+        return Inertia::render('AddPost', [
+            'instruments' => $instruments,
+            'genres' => $genres,
         ]);
     }
 
@@ -62,9 +86,12 @@ class PostController extends Controller
         $post = $user->posts()->create([
             'story' => $request->story,
             'music' => $filename,
-            'address' => $request->address,
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
+            'instrument_id' => $request->instrument_id,
+            'genre_id' => $request->genre_id,
+            'r_instrument_id' => $request->r_instrument_id,
+            // 'address' => $request->address,
+            // 'latitude' => $request->latitude,
+            // 'longitude' => $request->longitude,
         ]);
 
         return to_route('posts.index');

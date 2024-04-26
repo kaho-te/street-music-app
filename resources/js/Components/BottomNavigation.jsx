@@ -10,6 +10,7 @@ import { router } from "@inertiajs/react";
 import { useLocation } from "react-router-dom";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import MapIcon from '@mui/icons-material/Map';
 
 export default function SimpleBottomNavigation(props) {
     // アクセス時のURLを解析して、適切なナビゲーションボタンをアクティブにする。
@@ -63,6 +64,14 @@ export default function SimpleBottomNavigation(props) {
                     icon={<PersonIcon />}
                     onClick={() =>
                         router.visit(route("account.show"), { method: "get" })
+                    }
+                />
+                <TabBarButton
+                    value="streetmap"
+                    label="MAP"
+                    icon={<MapIcon />}
+                    onClick={() =>
+                        router.visit(route("post.map"), { method: "get" })
                     }
                 />
             </BottomNavigation>

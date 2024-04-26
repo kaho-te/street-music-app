@@ -1,9 +1,12 @@
 import {
     Box,
     Button,
+    FormControl,
     FormControlLabel,
+    MenuItem,
     Radio,
     RadioGroup,
+    Select,
     TextareaAutosize,
     TextField,
     Typography,
@@ -18,11 +21,6 @@ import { Link, useForm, usePage } from "@inertiajs/react";
 import ModalHeader from "@/Components/ModalHeader";
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
-import vmsg from "vmsg";
-
-// const recorder = new vmsg.Recorder({
-//     wasmURL: "https://unpkg.com/vmsg@0.3.0/vmsg.wasm"
-//   });
 
 const getCurrentDate = (props) => {
     const now = new Date();
@@ -35,7 +33,7 @@ const getCurrentDate = (props) => {
     return `${year}${month}${date}${hour}${minute}${seconds}`;
 };
 
-const AddMusic = (props) => {
+const AddPost = (props) => {
     const [recorder, setRecorder] = useState(null);
     const [isRecording, setIsRecording] = useState(false);
     const [error, setError] = useState("");
@@ -51,13 +49,19 @@ const AddMusic = (props) => {
         // icon: "",
         story: "",
         music: "",
-        post_code: "",
-        address: "",
-        latitude: props.position.lat,
-        longitude: props.position.lng,
+        instrument_id: 0,
+        genre_id: 0,
+        r_instrument_id: 0
+        // post_code: "",
+        // address: "",
+        // latitude: props.position.lat,
+        // longitude: props.position.lng,
     });
 
-    const apiKey = usePage().props.settings.map_api_key;
+    const instruments = props.instruments;
+    const genres = props.genres;
+
+    // const apiKey = usePage().props.settings.map_api_key;
 
     const handleChangeFile = (newfile) => {
         // file を参照するための一時的なURLを作成
@@ -182,27 +186,9 @@ const AddMusic = (props) => {
 
     // コンポーネントのアンマウント時にリソースを解放
     useEffect(() => {
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${data.latitude},${data.longitude}&key=${apiKey}`;
-        fetch(url)
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.results.length > 0) {
-                    const address = data.results[0].formatted_address;
-                    setData("address", address);
-                } else {
-                    console.log("No results found");
-                }
-            })
-            .catch((error) => {
-                console.log("Error:", error);
-            });
-        return () => {
-            if (recorder) {
-                recorder.destroy();
-            }
-            // recorder.initAudio();
-            // recorder.initWorker();
-        };
+        if (recorder) {
+            recorder.destroy();
+        }
     }, []);
 
     const handleSubmit = (e) => {
@@ -226,20 +212,56 @@ const AddMusic = (props) => {
                 <ModalHeader header="音楽を投稿する" />
                 <div className="px-3 pt-12">
                     <InputLabel
-                        htmlFor="address"
-                        value="設置場所"
+                        htmlFor="instrument"
+                        value="楽器"
                         className="mt-8 text-lg"
                     />
-                    <TextareaAutosize
-                        id="address"
-                        minRows={3}
-                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                        value={data.address}
-                        onChange={(e) => setData("address", e.target.value)}
-                        required
-                        isFocused
-                        autoComplete="address"
+                    <FormControl variant="outlined" sx={{ m: 1, minWidth: 120 }}>
+                    <Select
+                        value={data.instrument_id}
+                        onChange={(e) => setData("instrument_id", e.target.value)}
+                    >
+                        <MenuItem value={0}>楽器を選択してください</MenuItem>
+                        {instruments.map((inst) => (
+                            <MenuItem key={inst.id} value={inst.id}>{inst.name}</MenuItem>
+                        ))}
+                    </Select>
+                    </FormControl>
+
+                    <InputLabel
+                        htmlFor="genre"
+                        value="ジャンル"
+                        className="mt-8 text-lg"
                     />
+                    <FormControl variant="outlined" sx={{ m: 1, minWidth: 120 }}>
+                    <Select
+                        value={data.genre_id}
+                        onChange={(e) => setData("genre_id", e.target.value)}
+                    >
+                        <MenuItem value={0}>ジャンルを選択してください</MenuItem>
+                        {genres.map((genre) => (
+                            <MenuItem key={genre.id} value={genre.id}>{genre.name}</MenuItem>
+                        ))}
+                    </Select>
+                    </FormControl>
+
+                    <InputLabel
+                        htmlFor="r_instrument"
+                        value="セッションリクエスト"
+                        className="mt-8 text-lg"
+                    />
+                    <FormControl variant="outlined" sx={{ m: 1, minWidth: 120 }}>
+                    <Select
+                        value={data.r_instrument_id}
+                        onChange={(e) => setData("r_instrument_id", e.target.value)}
+                    >
+                        <MenuItem value={0}>楽器を選択してください</MenuItem>
+                        {instruments.map((inst) => (
+                            <MenuItem key={inst.id} value={inst.id}>{inst.name}</MenuItem>
+                        ))}
+                    </Select>
+                    </FormControl>
+
                     <InputLabel
                         htmlFor="story"
                         value="ストーリー"
@@ -337,4 +359,4 @@ const AddMusic = (props) => {
     );
 };
 
-export default AddMusic;
+export default AddPost;

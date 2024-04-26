@@ -50,7 +50,7 @@ const PlayMusic = (props) => {
     const [file, setFile] = useState();
     const [fileUrl, setFileUrl] = useState();
     const [open, setOpen] = useState(false);
-    const [playingStates, setPlayingStates] = useState({});
+    const [playingState, setPlayingState] = useState(false);
     const { data, setData, post } = useForm({
         text: "",
         music: "",
@@ -58,6 +58,12 @@ const PlayMusic = (props) => {
         post_id: props.post.id,
         user_id: props.auth.user.id,
     });
+
+    let audioCtx; // Must be initialized after a user interaction
+    const offlineCtx = new OfflineAudioContext(2, 44100 * 40, 44100);
+    const [song, setSong] = useState(null);
+    const [urls, setUrls] = useState([]);
+    const [selectedComments, setSelectedComments] = useState([]);
 
     useEffect(() => {
         setComments(props.post.comments);
@@ -109,7 +115,11 @@ const PlayMusic = (props) => {
                 recorder.destroy();
             }
             const stream = await navigator.mediaDevices.getUserMedia({
-                audio: true,
+                // audio: true,
+                audio: {
+                    autoGainControl: false,
+                    echoCancellation: false
+                },
                 video: false,
             });
             const newRecorder = new RecordRTC(stream.clone(), {
@@ -234,54 +244,88 @@ const PlayMusic = (props) => {
 
     const initializeSession = () => {
         return new Promise((resolve) => {
-            const initialStates = {};
-            comments.forEach((comment) => {
-                initialStates[comment.id] = "stopped";
-            });
-            setPlayingStates(initialStates);
+            setPlayingState(false);
             resolve();
         });
     };
 
     const handleSession = async (music_flg, comment_id) => {
-        await initializeSession();
-        await handleMainStop();
-        await handleSubStop(comment_id);
+        try {
+            await initializeSession();
+            await handleMainStop();
+            await handleSubStop(comment_id);
 
-        await Promise.all([handleSubPlay(comment_id), handleMainPlay()]);
+            // await Promise.all([handleSubPlay(comment_id), handleMainPlay()]);
+            const targetList = [mainAudioRef.current.src, ...selectedComments.map(id => subAudioRef.current[id].src)];
+            console.log(targetList);
 
-        setPlayingStates((prevStates) => ({
-            ...prevStates,
-            [comment_id]: "playing",
-        }));
+            // We can initialize the context as the user clicked.
+            audioCtx = new (window.AudioContext ||
+                window.webkitAudioContext)();
+          
+            // Fetch the data and start the song
+            getData(targetList);
+
+            setPlayingState(true);
+        } catch (e) {
+            console.log(e);
+        }
     };
 
-    const handlePlay = (comment_id) => {
-        handleMainPlay();
-        handleSubPlay(comment_id);
-        setPlayingStates((prevStates) => ({
-            ...prevStates,
-            [comment_id]: "playing",
-        }));
+    async function getData(targetList) {
+      // Fetch an audio track, decode it and stick it in a buffer.
+      // Then we put the buffer into the source and can play it.
+      const buffers = await Promise.all(targetList.map(async (url) => {
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        return audioCtx.decodeAudioData(arrayBuffer);
+    }));
+
+    buffers.forEach((buffer, index) => {
+        const source = offlineCtx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(offlineCtx.destination);
+        source.start();
+    });
+
+      // Start rendering
+      const renderedBuffer = await offlineCtx.startRendering();
+
+      // Play the rendered buffer
+      const song = new AudioBufferSourceNode(audioCtx, { buffer: renderedBuffer });
+      song.connect(audioCtx.destination);
+      song.start();
+      setSong(song);
+    }
+
+
+    // const handlePlay = (comment_id) => {
+    //     handleMainPlay();
+    //     handleSubPlay(comment_id);
+    //     setPlayingStates((prevStates) => ({
+    //         ...prevStates,
+    //         [comment_id]: "playing",
+    //     }));
+    // };
+
+    const handleStop = () => {
+        if (song) {
+            song.stop();
+            setSong(null);
+        }
+        audioCtx = new (window.AudioContext ||
+            window.webkitAudioContext)();
+        setPlayingState(false);
     };
 
-    const handleStop = (comment_id) => {
-        handleMainStop();
-        handleSubStop(comment_id);
-        setPlayingStates((prevStates) => ({
-            ...prevStates,
-            [comment_id]: "stopped",
-        }));
-    };
-
-    const handlePause = (comment_id) => {
-        mainAudioRef.current.pause();
-        subAudioRef.current[comment_id].pause();
-        setPlayingStates((prevStates) => ({
-            ...prevStates,
-            [comment_id]: "paused",
-        }));
-    };
+    // const handlePause = (comment_id) => {
+    //     mainAudioRef.current.pause();
+    //     subAudioRef.current[comment_id].pause();
+    //     setPlayingStates((prevStates) => ({
+    //         ...prevStates,
+    //         [comment_id]: "paused",
+    //     }));
+    // };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -299,6 +343,25 @@ const PlayMusic = (props) => {
             },
         });
     };
+
+    const handleCommentSelect = (commentId) => {
+        setSelectedComments((prevSelectedComments) => {
+            if (prevSelectedComments.includes(commentId)) {
+                // 既に選択されている場合は削除
+                return prevSelectedComments.filter(id => id !== commentId);
+            } else {
+                // 選択されていない場合は追加
+                return [...prevSelectedComments, commentId];
+            }
+        });
+    };
+
+
+    async function fetchAndDecodeAudio(url) {
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        return audioContext.decodeAudioData(arrayBuffer);
+    }
 
     return (
         <div className="text-gray-800">
@@ -407,6 +470,12 @@ const PlayMusic = (props) => {
                             <div className="mt-2">{comment.text}</div>
                         </div>
                     </div>
+                    
+                    <input
+            type="checkbox"
+            checked={selectedComments.includes(comment.id)}
+            onChange={() => handleCommentSelect(comment.id)}
+        />
 
                     <audio
                         className="my-3 mx-auto"
@@ -417,11 +486,15 @@ const PlayMusic = (props) => {
                         }
                     ></audio>
                     <div className="text-center w-full">
-                        {playingStates[comment.id] === "stopped" ? (
+ 
+                    </div>
+                </div>
+            ))}
+                         {playingState === false ? (
                             <Button
                                 variant="outlined"
                                 onClick={() =>
-                                    handleSession(comment.music_flg, comment.id)
+                                    handleSession()
                                 }
                                 style={{
                                     color: "#f7576b",
@@ -432,32 +505,9 @@ const PlayMusic = (props) => {
                             </Button>
                         ) : (
                             <div className="mx-auto">
-                                {playingStates[comment.id] === "paused" ? (
-                                    <Button
-                                        variant="outlined"
-                                        onClick={() => handlePlay(comment.id)}
-                                        style={{
-                                            color: "#f7576b",
-                                            borderColor: "#f7576b",
-                                        }}
-                                    >
-                                        Play
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        variant="outlined"
-                                        onClick={() => handlePause(comment.id)}
-                                        style={{
-                                            color: "#f7576b",
-                                            borderColor: "#f7576b",
-                                        }}
-                                    >
-                                        Pause
-                                    </Button>
-                                )}
                                 <Button
                                     variant="outlined"
-                                    onClick={() => handleStop(comment.id)}
+                                    onClick={() => handleStop()}
                                     style={{
                                         color: "#f7576b",
                                         borderColor: "#f7576b",
@@ -468,9 +518,6 @@ const PlayMusic = (props) => {
                                 </Button>
                             </div>
                         )}
-                    </div>
-                </div>
-            ))}
 
             <div>
                 <Modal className="" open={open} onClose={handleModalClose}>
