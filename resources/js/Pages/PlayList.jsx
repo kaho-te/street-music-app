@@ -2,17 +2,20 @@ import SimpleBottomNavigation from "@/Components/BottomNavigation";
 import React from "react";
 import Header from "@/Components/Header";
 import { Link } from "@inertiajs/react";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import MusicNoteIcon from "@mui/icons-material/MusicNote";
 
 const PlayList = (props) => {
     const storagePath = "../storage/audio/";
     const favoriteLists = props.favorite;
     return (
         <div>
-            <Header header="お気に入り" />
+            <Header header="Favorite List" />
             <div className="pt-12">
                 {favoriteLists.map((favorite, index) => (
                     <div
-                        className="mx-4 border-dotted border-b-2 border-gray-400"
+                        className="mx-4  border-b border-[#D0CDCD]"
                         key={favorite.id}
                     >
                         <Link
@@ -36,18 +39,40 @@ const PlayList = (props) => {
                                 </div>
                             </div>
 
-                            <div className="mt-2">{favorite.address}</div>
-                            <div className="mt-2 whitespace-pre-wrap">{favorite.story}</div>
-                            <audio
-                                className="mt-2 mb-4 mx-auto"
-                                controls
-                                src={
-                                    storagePath +
-                                    favorite.user_id +
-                                    "/" +
-                                    favorite.music
-                                }
-                            ></audio>
+                            {/* <div className="mt-2">{favorite.address}</div> */}
+                            <div className="mt-2 whitespace-pre-wrap">
+                                {favorite.story}
+                            </div>
+                            <div className="flex items-end">
+                                <audio
+                                    className="mt-2 mb-4 w-2/3"
+                                    controls
+                                    controlsList="nodownload"
+                                    src={
+                                        storagePath +
+                                        favorite.user_id +
+                                        "/" +
+                                        favorite.music
+                                    }
+                                ></audio>
+                                <div className="flex mt-2 ml-2 mb-4">
+                                    {props.isLike ? (
+                                        <FavoriteIcon
+                                            style={{ color: "#eb3495" }}
+                                        />
+                                    ) : (
+                                        <FavoriteBorderIcon />
+                                    )}
+                                    <div className="ml-1 text-lg">
+                                        {favorite.liked_count}
+                                    </div>
+
+                                    <MusicNoteIcon />
+                                    <div className="ml-1 text-lg">
+                                        {favorite.comments_count}
+                                    </div>
+                                </div>
+                            </div>
                         </Link>
                     </div>
                 ))}

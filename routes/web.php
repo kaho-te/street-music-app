@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/posts', PostController::class);
     Route::get('/post/{id}', [PostController::class, 'show'])->name('post.show');
     Route::post('/post/{id}', [PostController::class, 'destroy'])->name('post.destroy');
+    Route::get('/search/{categoryId}/{searchId}', [PostController::class, 'search'])->name('post.search');
     Route::post('/comment', [CommentController::class, 'store'])->name('comment.store');
     Route::post('/comment/{id}', [CommentController::class, 'destroy'])->name('comment.destroy');
     Route::get('/account', [AccountController::class, 'show'])->name('account.show');

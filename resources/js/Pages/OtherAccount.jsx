@@ -1,12 +1,8 @@
 import React from "react";
 import { Box, Button } from "@mui/material";
-import { Link, router, usePage } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import ModalHeader from "@/Components/ModalHeader";
 import { useState } from "react";
-import LyricsRoundedIcon from "@mui/icons-material/LyricsRounded";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import IconButton from "@mui/material/IconButton";
 
 const OtherAccount = (props) => {
     const user = props.account;
@@ -14,32 +10,9 @@ const OtherAccount = (props) => {
     const storagePath = "../storage/audio/";
     const [posts, setPosts] = useState(props.posts);
 
-    const handleLike = (post) => {
-        if (post.isLike==1) {
-            post(route("like.destroy", post), {
-                preserveScroll: true,
-                onSuccess: () => {
-                    // setPosts((prev) => ({
-                    //     ...prev,
-                    //     liked_count: prev.liked_count - 1,
-                    // }));
-                },
-            });
-        } else {
-            post(route("like.store", post), {
-                onSuccess: () => {
-                    // setPostData((prev) => ({
-                    //     ...prev,
-                    //     liked_count: prev.liked_count + 1,
-                    // }));
-                },
-            });
-        }
-    };
-
     return (
         <div>
-            <ModalHeader header="プロフィール" />
+            <ModalHeader header="Profile" />
             <Box className="mx-3 pt-12">
                 <div className="text-center">
                     <img
@@ -69,10 +42,10 @@ const OtherAccount = (props) => {
                             <td>{user.name}</td>
                         </tr>
                         <tr>
-                            <th className="text-left w-28 py-3">
+                            <th className="text-left align-top w-28 py-3">
                                 プロフィール
                             </th>
-                            <td className="whitespace-pre-wrap">
+                            <td className="whitespace-pre-wrap py-3">
                                 {account.profile}
                             </td>
                         </tr>
@@ -84,11 +57,11 @@ const OtherAccount = (props) => {
                     <div className="w-1/3 py-3 border-b-2 border-red-400">
                         投稿
                     </div>
-                    <div className="w-1/3 py-3">いいね</div>
+                    <div className="w-1/3 py-3">お気に入り</div>
                 </div>
                 {posts.map((post, index) => (
                     <div
-                        className="mx-4 border-dotted border-b-2 border-gray-400"
+                        className="mx-4 border-b border-[#D0CDCD]"
                         key={post.id}
                     >
                         <Link
@@ -112,41 +85,52 @@ const OtherAccount = (props) => {
                                 </div>
                             </div>
 
-                            <div className="mt-2">{post.address}</div>
-                            <div className="mt-2">{post.story}</div>
-                            <audio
-                                className="mt-2 mb-4 mx-auto"
-                                controls
-                                src={
-                                    storagePath +
-                                    post.user_id +
-                                    "/" +
-                                    post.music
-                                }
-                            ></audio>
-                            <div className="flex justify-around mt-2 ml-2 mr-8">
-                                <IconButton type="button" onClick={() => handleLike(post)}>
-                                    {post.isLike == 1 ? (
-                                        <FavoriteIcon
-                                            style={{ color: "#eb3495" }}
-                                        />
-                                    ) : (
-                                        <FavoriteBorderIcon />
-                                    )}
-                                    <div className="ml-1 text-lg">
-                                        {post.liked_count}
+                            {/* <div className="mt-2">{post.address}</div> */}
+                            <div className="mt-2 whitespace-pre-wrap">
+                                {post.story}
+                            </div>
+                            <div className="flex items-end">
+                                <audio
+                                    className="mt-2 mb-4 w-2/3"
+                                    controls
+                                    controlsList="nodownload"
+                                    src={
+                                        storagePath +
+                                        post.user_id +
+                                        "/" +
+                                        post.music
+                                    }
+                                ></audio>
+                                <div className="flex mt-2 ml-4 mb-4">
+                                        <div className="flex items-center">
+                                            {post.isLike == 1 ? (
+                                                <img
+                                                    className="w-8"
+                                                    src={`../../storage/image/star_on.png`}
+                                                    alt="お気に入り"
+                                                />
+                                            ) : (
+                                                <img
+                                                    className="w-8"
+                                                    src={`../../storage/image/star_off.png`}
+                                                    alt="お気に入り"
+                                                />
+                                            )}
+                                            <div className="text-base text-[#0000008a]">
+                                                {post.liked_count}
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center ml-3">
+                                            <img
+                                                className="w-8 h-6"
+                                                src={`../../storage/image/hHeart_off.png`}
+                                                alt="セッション数"
+                                            />
+                                            <div className="text-base text-[#0000008a]">
+                                                {post.comments_count}
+                                            </div>
+                                        </div>
                                     </div>
-                                </IconButton>
-
-                                <IconButton
-                                    type="button"
-                                    // onClick={handleModalOpen}
-                                >
-                                    <LyricsRoundedIcon />
-                                    <div className="ml-1 text-lg">
-                                        {post.comments_count}
-                                    </div>
-                                </IconButton>
                             </div>
                         </Link>
                     </div>

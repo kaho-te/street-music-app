@@ -38,12 +38,26 @@ class PostLikeController extends Controller
      */
     public function show()
     {
-        $favorite = Post::with('liked')->whereHas('liked', function($query){
-            $query->where('user_id', auth()->id());
-        })->with('user.account')->get();
+        $userId = auth()->id(); 
 
-        return Inertia::render('PlayList', [
-            'favorite' => $favorite
+        $results = Post::with('liked')->whereHas('liked', function($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->with('user.account')
+        ->addSelect(['isLike' => function ($query) use ($userId) {
+            $query->selectRaw('count(*) > 0')
+                  ->from('post_user')
+                  ->whereColumn('post_id', 'posts.id')
+                  ->where('user_id', $userId);
+        }])
+        ->withCount('liked')
+        ->withCount('comments')
+        ->get();
+
+        return Inertia::render('ResultList', [
+            'results' => $results,
+            'search_flg' => 0,
+            'category' => null,
+            'search' => null
         ]);
     }
 
