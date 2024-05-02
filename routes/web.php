@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/posts', PostController::class);
     Route::get('/post/{id}', [PostController::class, 'show'])->name('post.show');
     Route::post('/post/{id}', [PostController::class, 'destroy'])->name('post.destroy');
+    Route::get('/search/{categoryId}/{searchId}', [PostController::class, 'search'])->name('post.search');
     Route::post('/comment', [CommentController::class, 'store'])->name('comment.store');
     Route::post('/comment/{id}', [CommentController::class, 'destroy'])->name('comment.destroy');
     Route::get('/account', [AccountController::class, 'show'])->name('account.show');
@@ -50,6 +51,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/favoritelist', [PostLikeController::class, 'show'])->name('like.show');
     Route::post('/posts/{post}/like', [PostLikeController::class, 'store'])->name('like.store');
     Route::post('/posts/{post}/dislike', [PostLikeController::class, 'destroy'])->name('like.destroy');
+    Route::get('/streetmap', [PostController::class, 'get_posts'])->name('post.map');
 });
 
 Route::prefix('chat')->middleware('auth')->controller(ChatController::class)->group(function(){

@@ -10,7 +10,7 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title','story','music','address','latitude','longitude'];
+    protected $fillable = ['title','story','music','address','latitude','longitude','instrument_id','genre_id','r_instrument_id'];
 
     public function liked()
     {
@@ -25,6 +25,21 @@ class Post extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+
+    public function instrument()
+    {
+        return $this->belongsTo(Instrument::class, 'instrument_id');
+    }
+
+    public function genre()
+    {
+        return $this->belongsTo(Genre::class);
+    }
+
+    public function r_instrument()
+    {
+        return $this->belongsTo(Instrument::class, 'r_instrument_id');
     }
 
     /**

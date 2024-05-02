@@ -1,15 +1,12 @@
 import React from "react";
 import HomeIcon from "@mui/icons-material/Home";
 import PersonIcon from "@mui/icons-material/Person";
-import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
-import { PageData } from "../Data/PageData";
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
 import { router } from "@inertiajs/react";
-import { useLocation } from "react-router-dom";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
-import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import MapIcon from '@mui/icons-material/Map';
 
 export default function SimpleBottomNavigation(props) {
     // アクセス時のURLを解析して、適切なナビゲーションボタンをアクティブにする。
@@ -17,6 +14,7 @@ export default function SimpleBottomNavigation(props) {
 
     const TabBarButton = styled(BottomNavigationAction)({
         color: "gray",
+        backgroundColor: "#FFF9F6",
         "&.Mui-selected": {
             color: "#e26575",
         },
@@ -34,7 +32,7 @@ export default function SimpleBottomNavigation(props) {
             >
                 <TabBarButton
                     value="posts"
-                    label="ホーム"
+                    label="Home"
                     icon={<HomeIcon />}
                     onClick={() =>
                         router.visit(route("posts.index"), { method: "get" })
@@ -42,13 +40,13 @@ export default function SimpleBottomNavigation(props) {
                 />
                 <TabBarButton
                     value="favoritelist"
-                    label="お気に入り"
+                    label="Favorite"
                     icon={<QueueMusicIcon />}
                     onClick={() =>
                         router.visit(route("like.show"), { method: "get" })
                     }
                 />
-                <TabBarButton
+                {/* <TabBarButton
                     value="chat"
                     label="メッセージ"
                     icon={<MailOutlineIcon />}
@@ -56,15 +54,23 @@ export default function SimpleBottomNavigation(props) {
                         // router.visit(route("chat.index"), { method: "get" })
                         console.log("メッセージ")
                     }
-                />
+                /> */}
                 <TabBarButton
                     value="account"
-                    label="アカウント"
+                    label="Account"
                     icon={<PersonIcon />}
                     onClick={() =>
                         router.visit(route("account.show"), { method: "get" })
                     }
                 />
+                {/* <TabBarButton
+                    value="streetmap"
+                    label="MAP"
+                    icon={<MapIcon />}
+                    onClick={() =>
+                        router.visit(route("post.map"), { method: "get" })
+                    }
+                /> */}
             </BottomNavigation>
         </>
     );

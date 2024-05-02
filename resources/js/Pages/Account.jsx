@@ -10,7 +10,7 @@ const Account = () => {
 
     return (
         <div>
-            <Header header="アカウント" />
+            <Header header="Account" />
             <Box className="mx-3 pt-12">
                 <div className="text-center">
                     <img
@@ -30,7 +30,7 @@ const Account = () => {
                             borderColor: "#f7576b",
                         }}
                     >
-                        プロフィールを編集する
+                        プロフィールを編集
                     </Button>
                 </div>
                 <table className="mt-5">
@@ -44,10 +44,10 @@ const Account = () => {
                             <td>{user.email}</td>
                         </tr>
                         <tr>
-                            <th className="text-left w-28 py-3">
+                            <th className="text-left align-top w-28 py-3">
                                 プロフィール
                             </th>
-                            <td className="whitespace-pre-wrap">{user.account.profile}</td>
+                            <td className="whitespace-pre-wrap py-3">{user.account.profile}</td>
                         </tr>
                     </tbody>
                 </table>
